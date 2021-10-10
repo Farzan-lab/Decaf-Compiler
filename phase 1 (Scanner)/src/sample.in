@@ -1,8 +1,8 @@
-name someone
+class Program { void main () {} }
 
-Hello
-This is a sample input file for the
-standalone example scanner.
 
-Have a nice day!
+define SEMICOLON ;
+define FOR100 for(i = 0; i < 100; i += 1)
 
+FOR100
+Print(i)SEMICOLON
