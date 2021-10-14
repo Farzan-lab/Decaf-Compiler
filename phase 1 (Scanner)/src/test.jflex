@@ -19,7 +19,7 @@ import java.io.*;
 
 %%
 
-%class mn
+%class mainn
 %standalone
 %unicode
 
@@ -37,19 +37,12 @@ import java.io.*;
 //     OPENBRACE, CLOSEBRACE, OPENPARENTHESES, CLOSEPARENTHESES, OPENCURLYBRACET, CLOSECURLYBRACET,
 //     COMMENT, MULTILINECOMMENT 
 //   };
-StringBuffer string = new StringBuffer();
-public static String text = new String();
-  // public static Writer writer;
-
-  // public void getToken(String value) throws IOException
-  // {
-	//   writer.write(value + "\n");
-  // }
-
-  // public void getToken(TokenName token, String value) throws IOException
-  // {
-  //   writer.write(token.toString() + " " + value + "\n");
-  // }
+class Token {
+String text;
+Token(String t){text = t;}
+}
+  public static Writer writer;
+  StringBuffer string = new StringBuffer();
 
 %}
 // %%
@@ -101,71 +94,66 @@ BOOLEANLITERAL = ("true" | "false")
 %state STRING
 
 %%
-<YYINITIAL> {
+// <YYINITIAL> {
 /*******Keywords************/
-void         { text = text.concat("void\n");}
-int         { text = text.concat("int\n");}
-double         { text = text.concat("double\n");}
-bool       { text = text.concat("bool\n");}
-string       { text = text.concat("string\n");}
-class       { text = text.concat("class\n");}
-null       { text = text.concat("null\n");}
-for       { text = text.concat("for\n");}
-while       { text = text.concat("while\n");}
-if       { text = text.concat("if\n");}
-else       {text = text.concat("else\n");}
-return       {text = text.concat("return\n");}
-break       { text = text.concat("break\n");}
-new       { text = text.concat("new\n");}
-this       { text = text.concat("this\n");}
-NewArray       { text = text.concat("NewArray\n");}
-Print       {text = text.concat("Print\n");}
-ReadInteger      { text = text.concat("ReadInteger\n");}
-ReadLine     { text = text.concat("ReadLine\n");}
+void         { return new Token(yytext());}
+// int         { writer.write(yytext() + "\n");}
+// double         { writer.write(yytext() + "\n");}
+// bool       { writer.write(yytext() + "\n");}
+// string       { writer.write(yytext() + "\n");}
+// class       { writer.write(yytext() + "\n");}
+// null       { writer.write(yytext() + "\n");}
+// for       { writer.write(yytext() + "\n");}
+// while       { writer.write(yytext() + "\n");}
+// if       { writer.write(yytext() + "\n");}
+// else       { writer.write(yytext() + "\n");}
+// return       { writer.write(yytext() + "\n");}
+// break       { writer.write(yytext() + "\n");}
+// new       { writer.write(yytext() + "\n");}
+// this       { writer.write(yytext() + "\n");}
+// NewArray       { writer.write(yytext() + "\n");}
+// Print       { writer.write(yytext() + "\n");}
+// ReadInteger      { writer.write(yytext() + "\n");}
+// ReadLine     { writer.write(yytext() + "\n");}
+
+// /******BOOLEANLITERAL********/
+// {BOOLEANLITERAL} { writer.write("T_BOOLEANLITERAL " + yytext() + "\n");}
 
 
-/*******Define method*********/
-// "Define "[:jletter:] [:jletterdigit:]* {methode = yytext().substring(5);}
+// /*******Identification*******/
+// {Identifier} { writer.write("T_ID " + yytext() + "\n");}
 
 
-/******BOOLEANLITERAL********/
-{BOOLEANLITERAL} {text = text.concat("T_BOOLEANLITERAL "+yytext()+"\n");}
+// /*******DOUBLELITERAL*******/
+// {DOUBLELITERAL} { writer.write("T_DOUBLELITERAL " + yytext() + "\n");}
 
 
-/*******Identification*******/
-{Identifier} { text = text.concat("T_ID "+yytext()+"\n");}
+// /********INTLITERAL*********/
+// {DecIntegerLiteral} { writer.write("T_INTLITERAL " + yytext() + "\n");}
+// {HexIntegerLiteral} {writer.write("T_INTLITERAL " + yytext() + "\n"); System.out.println(" "+yytext());}
+
+// //writer.write(" " + yytext() + "\n");
+// /********OPERATOR***********/
+// {OPERATOR} { writer.write(yytext() + "\n");} 
 
 
-/*******DOUBLELITERAL*******/
-{DOUBLELITERAL} { text = text.concat("T_DOUBLELITERAL "+yytext()+"\n");}
+// /******BOOLEANLITERAL******/
 
+// /*********STRING***********/
+// \"  {string.setLength(0); yybegin(STRING);}
 
-/********INTLITERAL*********/
-{DecIntegerLiteral} { text = text.concat("T_INTLITERAL "+yytext()+"\n");}
-{HexIntegerLiteral} { text = text.concat("T_INTLITERAL "+yytext()+"\n");}
+// }
+// <STRING>{
+// \" { writer.write("I_STRINGLITERAL "+'"'+string.toString()+'"'+ "\n"); yybegin(YYINITIAL);}
 
+// [^\n\r\"\\]+ { string.append( yytext() ); }
+// }
+// // {LineTerminator}  {/* Ignore*/}
+// {WhiteSpace}      {/* Ignore*/}
+// // {EndOfLineComment} {/* Ignore*/}
+// // {TraditionalComment} {/*Ignore*/}
+// {Comment} {/*Ingnore*/}
+// // {Comment} {/*Ignore*/}
+// // {Identifier} { System.out.println("T_id");}
 
-/********OPERATOR***********/
-{OPERATOR} { text = text.concat(yytext()+"\n");} 
-
-
-/******BOOLEANLITERAL******/
-
-/*********STRING***********/
-\"  {string.setLength(0); yybegin(STRING);}
-// "dsfdg"
-}
-<STRING>{
-\" {  text = text.concat("I_STRINGLITERAL "+'"'+string.toString()+'"'+"\n"); yybegin(YYINITIAL);}
-
-[^\n\r\"\\]+ { string.append( yytext() ); }
-}
-// {LineTerminator}  {/* Ignore*/}
-{WhiteSpace}      {/* Ignore*/}
-// {EndOfLineComment} {/* Ignore*/}
-// {TraditionalComment} {/*Ignore*/}
-{Comment} {/*Ingnore*/}
-// {Comment} {/*Ignore*/}
-// {Identifier} { System.out.println("T_id");}
-
-// [^] { throw new Error("Illegal character <"+yytext()+">"); }
+// // [^] { throw new Error("Illegal character <"+yytext()+">"); }

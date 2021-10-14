@@ -19,11 +19,12 @@
 */
 
 // package de.jflex.example.standalone;
+import java.io.*;
 
 
 // See https://github.com/jflex-de/jflex/issues/222
 @SuppressWarnings("FallThrough")
-public class Subst {
+class mn {
 
   /** This character denotes the end of file. */
   public static final int YYEOF = -1;
@@ -697,7 +698,33 @@ public class Subst {
   private boolean zzEOFDone;
 
   /* user code: */
-   StringBuffer string = new StringBuffer();
+
+//   enum TokenName 
+//   {
+//     VOID, CLASS, INTERFACE, NULL, THIS, EXTENDS, IMPLEMENTS,
+//     FOR, WHILE, IF, ELSE, RETURN, BREAK, CONTINUE,
+//     TRUE, FALSE, NEW, NEWARRAY, PRINT, READINTEGER, READLINE,
+//     DTOI, ITOD, BTOI, ITOB, PRIVATE, PROTECTED, PUBLIC, 
+//     T_INTLITERAL, T_DOUBLELITERAL, T_STRINGLITERAL, T_BOOLEANLITERAL, T_ID,
+//     ADD, SUB, MUL, DIV, MOD, LT, LTE, ASSIGN, EQ, NEQ, GT, GTE,
+//     NOT, OR, AND, SEMICOLON, COMMA, DOT,
+//     OPENBRACE, CLOSEBRACE, OPENPARENTHESES, CLOSEPARENTHESES, OPENCURLYBRACET, CLOSECURLYBRACET,
+//     COMMENT, MULTILINECOMMENT 
+//   };
+StringBuffer string = new StringBuffer();
+public static String text = new String();
+  // public static Writer writer;
+
+  // public void getToken(String value) throws IOException
+  // {
+	//   writer.write(value + "\n");
+  // }
+
+  // public void getToken(TokenName token, String value) throws IOException
+  // {
+  //   writer.write(token.toString() + " " + value + "\n");
+  // }
+
 
 
   /**
@@ -705,7 +732,7 @@ public class Subst {
    *
    * @param   in  the java.io.Reader to read input from.
    */
-  public Subst(java.io.Reader in) {
+  mn(java.io.Reader in) {
     this.zzReader = in;
   }
 
@@ -1046,7 +1073,7 @@ public class Subst {
             // fall through
           case 32: break;
           case 3:
-            { System.out.println(yytext());
+            { text = text.concat(yytext()+"\n");
             }
             // fall through
           case 33: break;
@@ -1056,12 +1083,12 @@ public class Subst {
             // fall through
           case 34: break;
           case 5:
-            { System.out.println("T_ID "+yytext());
+            { text = text.concat("T_ID "+yytext()+"\n");
             }
             // fall through
           case 35: break;
           case 6:
-            { System.out.println("T_INTLITERAL "+yytext());
+            { text = text.concat("T_INTLITERAL "+yytext()+"\n");
             }
             // fall through
           case 36: break;
@@ -1071,7 +1098,7 @@ public class Subst {
             // fall through
           case 37: break;
           case 8:
-            { System.out.println("I_STRINGLITERAL "+'"'+string.toString()+'"'); yybegin(YYINITIAL);
+            { text = text.concat("I_STRINGLITERAL "+'"'+string.toString()+'"'+"\n"); yybegin(YYINITIAL);
             }
             // fall through
           case 38: break;
@@ -1081,107 +1108,107 @@ public class Subst {
             // fall through
           case 39: break;
           case 10:
-            { System.out.println("T_DOUBLELITERAL "+yytext());
+            { text = text.concat("T_DOUBLELITERAL "+yytext()+"\n");
             }
             // fall through
           case 40: break;
           case 11:
-            { System.out.println("if");
+            { text = text.concat("if\n");
             }
             // fall through
           case 41: break;
           case 12:
-            { System.out.println("for");
+            { text = text.concat("for\n");
             }
             // fall through
           case 42: break;
           case 13:
-            { System.out.println("int");
+            { text = text.concat("int\n");
             }
             // fall through
           case 43: break;
           case 14:
-            { System.out.println("new");
+            { text = text.concat("new\n");
             }
             // fall through
           case 44: break;
           case 15:
-            { System.out.println("bool");
+            { text = text.concat("bool\n");
             }
             // fall through
           case 45: break;
           case 16:
-            { System.out.println("else");
+            { text = text.concat("else\n");
             }
             // fall through
           case 46: break;
           case 17:
-            { System.out.println("null");
+            { text = text.concat("null\n");
             }
             // fall through
           case 47: break;
           case 18:
-            { System.out.println("this");
+            { text = text.concat("this\n");
             }
             // fall through
           case 48: break;
           case 19:
-            { System.out.println("T_BOOLEANLITERAL "+yytext());
+            { text = text.concat("T_BOOLEANLITERAL "+yytext()+"\n");
             }
             // fall through
           case 49: break;
           case 20:
-            { System.out.println("void");
+            { text = text.concat("void\n");
             }
             // fall through
           case 50: break;
           case 21:
-            { System.out.println("Print");
+            { text = text.concat("Print\n");
             }
             // fall through
           case 51: break;
           case 22:
-            { System.out.println("break");
+            { text = text.concat("break\n");
             }
             // fall through
           case 52: break;
           case 23:
-            { System.out.println("class");
+            { text = text.concat("class\n");
             }
             // fall through
           case 53: break;
           case 24:
-            { System.out.println("while");
+            { text = text.concat("while\n");
             }
             // fall through
           case 54: break;
           case 25:
-            { System.out.println("double");
+            { text = text.concat("double\n");
             }
             // fall through
           case 55: break;
           case 26:
-            { System.out.println("return");
+            { text = text.concat("return\n");
             }
             // fall through
           case 56: break;
           case 27:
-            { System.out.println("string");
+            { text = text.concat("string\n");
             }
             // fall through
           case 57: break;
           case 28:
-            { System.out.println("NewArray");
+            { text = text.concat("NewArray\n");
             }
             // fall through
           case 58: break;
           case 29:
-            { System.out.println("ReadLine");
+            { text = text.concat("ReadLine\n");
             }
             // fall through
           case 59: break;
           case 30:
-            { System.out.println("ReadInteger");
+            { text = text.concat("ReadInteger\n");
             }
             // fall through
           case 60: break;
@@ -1203,7 +1230,7 @@ public class Subst {
    */
   public static void main(String[] argv) {
     if (argv.length == 0) {
-      System.out.println("Usage : java Subst [ --encoding <name> ] <inputfile(s)>");
+      System.out.println("Usage : java mn [ --encoding <name> ] <inputfile(s)>");
     }
     else {
       int firstFilePos = 0;
@@ -1220,11 +1247,11 @@ public class Subst {
         }
       }
       for (int i = firstFilePos; i < argv.length; i++) {
-        Subst scanner = null;
+        mn scanner = null;
         try {
           java.io.FileInputStream stream = new java.io.FileInputStream(argv[i]);
           java.io.Reader reader = new java.io.InputStreamReader(stream, encodingName);
-          scanner = new Subst(reader);
+          scanner = new mn(reader);
           while ( !scanner.zzAtEOF ) scanner.yylex();
         }
         catch (java.io.FileNotFoundException e) {
