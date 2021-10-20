@@ -25,59 +25,11 @@ import java.io.*;
 
 %{
 
-//   enum TokenName 
-//   {
-//     VOID, CLASS, INTERFACE, NULL, THIS, EXTENDS, IMPLEMENTS,
-//     FOR, WHILE, IF, ELSE, RETURN, BREAK, CONTINUE,
-//     TRUE, FALSE, NEW, NEWARRAY, PRINT, READINTEGER, READLINE,
-//     DTOI, ITOD, BTOI, ITOB, PRIVATE, PROTECTED, PUBLIC, 
-//     T_INTLITERAL, T_DOUBLELITERAL, T_STRINGLITERAL, T_BOOLEANLITERAL, T_ID,
-//     ADD, SUB, MUL, DIV, MOD, LT, LTE, ASSIGN, EQ, NEQ, GT, GTE,
-//     NOT, OR, AND, SEMICOLON, COMMA, DOT,
-//     OPENBRACE, CLOSEBRACE, OPENPARENTHESES, CLOSEPARENTHESES, OPENCURLYBRACET, CLOSECURLYBRACET,
-//     COMMENT, MULTILINECOMMENT 
-//   };
 StringBuffer string = new StringBuffer();
-public static String text = new String();
-  // public static Writer writer;
-
-  // public void getToken(String value) throws IOException
-  // {
-	//   writer.write(value + "\n");
-  // }
-
-  // public void getToken(TokenName token, String value) throws IOException
-  // {
-  //   writer.write(token.toString() + " " + value + "\n");
-  // }
+public String text = new String();
+  
 
 %}
-// %%
-
-// %public
-// %class Subst
-// %standalone
-
-// // %unicode
-// // %cup
-// // %line
-// // %column
-
-// %{
-//    public static Writer writer;
-
-//    StringBuffer string = new StringBuffer();
-   
-//   public void getToken(String value) throws IOException
-//   {
-// 	  writer.write(value + "\n");
-//   }
-
-//   public void getToken(TokenName token, String value) throws IOException
-//   {
-//     writer.write(token.toString() + " " + value + "\n");
-//   }
-// %}
 
 LineTerminator = \r|\n|\r\n
 InputCharacter = [^\r\n]
@@ -92,11 +44,13 @@ EndOfLineComment = "//" {InputCharacter}* {LineTerminator}?
 DocumentationComment = "/**" {CommentContent} "*"+ "/"
 CommentContent = ( [^*] | \*+ [^/*] )*
 Identifier = [:jletter:] [:jletterdigit:]*
-DecIntegerLiteral = 0 | [1-9][0-9]*
+DecIntegerLiteral = [0-9][0-9]*
 HexIntegerLiteral = [0][xX][0-9a-fA-F]+ 
-DOUBLELITERAL = [0-9]+"."[0-9]*[[[eE] [-+]]? [0-9]*[0-9]+]?
-OPERATOR = ("+"|"-"|"*"|"/"|"%"|"="|"<"|">"|"."|","|";"|"!"|"("|")"|"["|"]"|"{"|"}"|"<="|"!="|">="|"&&"|"=="|"||")
+DOUBLELITERAL = [0-9]+\.[0-9]*[Ee][-+]?[0-9]+
+OPERATOR = ("+"|"-"|"*"|"/"|"%"|"="|"<"|">"|"."|","|";"|"!"|"("|")"|"["|"]"|"{"|"}"|"<="|"!="|">="|"&&"|"=="|"||"|"+"|"-"|"*"|"/"|"%"|"<"|"<="|">"|">="|"="|"=="|"!="|"&&"|"||"|"!"|";"|","|"."|"["|"]"|"("|")"|"{"|"}"|"=="|"!="|"<="|"<"|">"|">="|"="|"not"|"~"|"&"|"and"|"|"|"or"|"^"|"*"|"+"|"+="|"-"|"++"|"--"|"-="|"*="|"/="|"/"|"%"|"{"|"}"|"("|")"|"."|","|":"|";"|"["|"]")
 BOOLEANLITERAL = ("true" | "false")
+
+StringLiteral = \"[^(\\n|\\r)]~\"
 // comments = CommentContent|DocumentationCommen|EndOfLineComment|TraditionalComment
 %state STRING
 
@@ -122,7 +76,16 @@ NewArray       { text = text.concat("NewArray\n");}
 Print       {text = text.concat("Print\n");}
 ReadInteger      { text = text.concat("ReadInteger\n");}
 ReadLine     { text = text.concat("ReadLine\n");}
-
+import      { text = text.concat("import\n");}
+__line__    {text = text.concat("__line__\n");}
+__func__    {text = text.concat("__func__\n");}
+btoi        {text = text.concat("btoi\n");}
+continue    {text = text.concat("continue\n");}
+dtoi      {text = text.concat("dtoi\n");}
+itob    {text = text.concat("itob\n");}
+itod    {text = text.concat("itod\n");}
+private {text = text.concat("private\n");}
+public {text = text.concat("public\n");}
 
 /*******Define method*********/
 // "Define "[:jletter:] [:jletterdigit:]* {methode = yytext().substring(5);}
@@ -138,7 +101,7 @@ ReadLine     { text = text.concat("ReadLine\n");}
 
 /*******DOUBLELITERAL*******/
 {DOUBLELITERAL} { text = text.concat("T_DOUBLELITERAL "+yytext()+"\n");}
-
+[0-9]+\.[0-9]* { text = text.concat("T_DOUBLELITERAL "+yytext()+"\n");}
 
 /********INTLITERAL*********/
 {DecIntegerLiteral} { text = text.concat("T_INTLITERAL "+yytext()+"\n");}
@@ -155,17 +118,25 @@ ReadLine     { text = text.concat("ReadLine\n");}
 \"  {string.setLength(0); yybegin(STRING);}
 // "dsfdg"
 }
-<STRING>{
-\" {  text = text.concat("I_STRINGLITERAL "+'"'+string.toString()+'"'+"\n"); yybegin(YYINITIAL);}
 
-[^\n\r\"\\]+ { string.append( yytext() ); }
+<STRING> {
+\" {  text = text.concat("T_STRINGLITERAL "+'"'+string.toString()+yytext()+"\n"); yybegin(YYINITIAL); }
+
+  \\\' { string.append("\\\'"); }
+    \\t { string.append("\\t"); }
+    \\n { string.append("\\n"); }
+    \\r { string.append("\\r"); }
+    \\\" { string.append("\\\""); }
+    \\ { string.append("\\"); }
+    \\b { string.append("\\b"); }
+    \\v { string.append("\\v"); }
+    \\f { string.append("\\f"); }
+    \\0 { string.append("\\0"); }
+    [^\n\r\"\\]* { string.append( yytext() ); }
 }
-// {LineTerminator}  {/* Ignore*/}
-{WhiteSpace}      {/* Ignore*/}
-// {EndOfLineComment} {/* Ignore*/}
-// {TraditionalComment} {/*Ignore*/}
-{Comment} {/*Ingnore*/}
-// {Comment} {/*Ignore*/}
-// {Identifier} { System.out.println("T_id");}
 
-// [^] { throw new Error("Illegal character <"+yytext()+">"); }
+{WhiteSpace}      {/* Ignore*/}
+
+{Comment} {/*Ingnore*/}
+
+[^] { throw new Error("Illegal character <"+yytext()+">"); }
