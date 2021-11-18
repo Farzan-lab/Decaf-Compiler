@@ -44,7 +44,7 @@ Identifier = [:jletter:] [:jletterdigit:]*
 DecIntegerLiteral = [0-9][0-9]*
 HexIntegerLiteral = [0][xX][0-9a-fA-F]+ 
 DOUBLELITERAL = [0-9]+\.[0-9]*[Ee][-+]?[0-9]+
-OPERATOR = ("not"|"~"|"&"|"and"|"|"|"or"|"^"|"+="|"-"|"++"|"--"|"-="|"*="|"/="|":")
+// OPERATOR = (":")
 BOOLEANLITERAL = ("true" | "false")
 
 StringLiteral = \"[^(\\n|\\r)]~\"
@@ -70,6 +70,7 @@ StringLiteral = \"[^(\\n|\\r)]~\"
 "class" { return symbol(sym.CLASS); }
 "interface" { return symbol(sym.INTERFACE); }
 "null" { return symbol(sym.NULL); }
+"NULL" { return symbol(sym.NULL); }
 "dtoi" { return symbol(sym.DTOI); }
 "itod" { return symbol(sym.ITOD); }
 "btoi" { return symbol(sym.BTOI); }
@@ -83,23 +84,26 @@ StringLiteral = \"[^(\\n|\\r)]~\"
 "break" { return symbol(sym.BREAK); }
 "public" { return symbol(sym.PUBLIC); }
 "int" { return symbol(sym.INT); }
-"double" { return symbol(sym.DOUBLE); }
 "bool" { return symbol(sym.BOOLEAN); }
+"double" { return symbol(sym.DOUBLE); }
 "string" { return symbol(sym.STRING); }
 "import "     {  return symbol(sym.IMPORT);}
 "__line__"    { return symbol(sym.__LINE__);}
+"function"			 { return symbol(sym.FUNCTION); }
 "__func__"    { return symbol(sym.__FUNC__);}
-
+"begin"				 { return symbol(sym.BEGIN); }
+"record"			 { return symbol(sym.RECORD); }
+"end"				   { return symbol(sym.END); }
 /*******Define method*********/
 // "Define "[:jletter:] [:jletterdigit:]* {methode = yytext().substring(5);}
 
 
 /******BOOLEANLITERAL********/
-{BOOLEANLITERAL} {text = text.concat("T_BOOLEANLITERAL "+yytext()+"\n");}
+{BOOLEANLITERAL} {return token( Sym.T_BOOLEANLITERAL, yytext() );}
 
 
 /*******Identification*******/
-{Identifier} { text = text.concat("T_ID "+yytext()+"\n");}
+{Identifier} { return symbol(sym.ID, new String(yytext())); }
 
 
 /*******DOUBLELITERAL*******/
@@ -107,8 +111,8 @@ StringLiteral = \"[^(\\n|\\r)]~\"
 [0-9]+\.[0-9]* { text = text.concat("T_DOUBLELITERAL "+yytext()+"\n");}
 
 /********INTLITERAL*********/
-{DecIntegerLiteral} { text = text.concat("T_INTLITERAL "+yytext()+"\n");}
-{HexIntegerLiteral} { text = text.concat("T_INTLITERAL "+yytext()+"\n");}
+{DecIntegerLiteral} { return symbol(sym.INTCONST, new Integer(yytext())); }
+{HexIntegerLiteral} { return symbol (sym.INTCONSTANT, yytext()); }
 
 
 /********OPERATOR***********/
@@ -137,9 +141,20 @@ StringLiteral = \"[^(\\n|\\r)]~\"
 ")" { return symbol (sym.RIGHTPAREN); }
 "{" { return symbol (sym.LEFTAKULAD); }
 "}" { return symbol (sym.RIGHTAKULAD); }
-
-
-/******BOOLEANLITERAL******/
+"++"{ return symbol(sym.INC); }
+"--"{ return symbol(sym.DEC); }
+"-="{ return symbol(sym.SUBASS); }
+"*="{ return symbol(sym.MULTASS); }
+"/="{ return symbol(sym.DIVASS); }
+"not"{ return symbol(sym.NOT); }
+"~"	{ return symbol(sym.BITNEG); }
+"&"	{ return symbol(sym.ARITHAND); }
+"and"{ return symbol(sym.LOGICAND); }
+"|"	{ return symbol(sym.ARITHOR); }
+"or"{ return symbol(sym.LOGICOR); }
+"^"{ return symbol(sym.XOR); }
+"+="{ return symbol(sym.ADDASS); }
+":"{ return symbol(sym.COLON); }
 
 /*********STRING***********/
 \"  {string.setLength(0); yybegin(STRING);}
