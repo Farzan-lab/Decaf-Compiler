@@ -1,0 +1,54 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Launch mainn",
+      "request": "launch",
+      "mainClass": "mainn",
+      "projectName": "phase 2_9eb26af5"
+    },
+    {
+      "type": "java",
+      "name": "Launch mian",
+      "request": "launch",
+      "mainClass": "mian",
+      "projectName": "phase 2_9eb26af5"
+    },
+    {
+      "type": "java",
+      "name": "Launch Lexer",
+      "request": "launch",
+      "mainClass": "Lexer",
+      "projectName": "phase 2_9eb26af5"
+    },
+    {
+      "type": "java",
+      "name": "Launch main",
+      "request": "launch",
+      "mainClass": "main",
+      "projectName": "phase 2_9eb26af5"
+    },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "c:\\Users\\Lost Boy\\Desktop\\university\\compiler\\Decaf compiler1\\phase 2",
+      "environment": [],
+      "program": "c:\\Users\\Lost Boy\\Desktop\\university\\compiler\\Decaf compiler1\\phase 2\\build\\Debug\\outDebug",
+      "internalConsoleOptions": "openOnSessionStart",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "externalConsole": false,
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}

@@ -2,11 +2,12 @@
 import java.io.*;
 import java_cup.runtime.*;
 
+// import parser.sym;
 %%
-
+// %implements sym
 %public
-%class lexer
-// %standalone
+%class Lexer
+%standalone
 %unicode
 %type Symbol
 %cup
@@ -15,14 +16,18 @@ import java_cup.runtime.*;
 
 %{
 
-public Symbol token(int tokentype){
-  System.out.println(yytext());
-  return new Symbol (tokentype,yytext());
-}
+    private Symbol symbol(int type) {
+    System.out.println(yytext());
+		return new Symbol(type, yyline, yycolumn);
+    }
 
+    private Symbol symbol(int type, Object value) {
+      System.out.println(yytext());
+    	return new Symbol(type, yyline, yycolumn, value);
+    }
 
-
-StringBuffer string = new StringBuffer();
+  StringBuilder string;
+  StringBuilder character;
 public String text = new String();
   
 
@@ -36,12 +41,18 @@ WhiteSpace = {LineTerminator} | [ \t\f]
 Comment = {TraditionalComment} | {EndOfLineComment} | {DocumentationComment}
 TraditionalComment = "/*" [^*] ~"*/" | "/*" "*"+ "/"
 // Comment can be the last line of the file, without line terminator.
+Float = {DecInt}.{DecInt}
+SciFloat = (({DecInt} | {Float}) ("e" | "E") ("+" | "-")? {DecInt})
 
 EndOfLineComment = "//" {InputCharacter}* {LineTerminator}?
 DocumentationComment = "/**" {CommentContent} "*"+ "/"
 CommentContent = ( [^*] | \*+ [^/*] )*
 Identifier = [:jletter:] [:jletterdigit:]*
 DecIntegerLiteral = [0-9][0-9]*
+
+Float = {DecIntegerLiteral}.{DecIntegerLiteral}
+SciFloat = (({DecIntegerLiteral} | {Float}) ("e" | "E") ("+" | "-")? {DecIntegerLiteral})
+
 HexIntegerLiteral = [0][xX][0-9a-fA-F]+ 
 DOUBLELITERAL = [0-9]+\.[0-9]*[Ee][-+]?[0-9]+
 // OPERATOR = (":")
@@ -59,10 +70,13 @@ StringLiteral = \"[^(\\n|\\r)]~\"
 "implements" { return symbol(sym.IMPLEMENTS); }
 "for" { return symbol(sym.FOR);}
 "continue" { return symbol(sym.CONTINUE); }
-"true" { return symbol(sym.BOOLCONSTANT, yytext()); }
-"false" { return symbol(sym.BOOLCONSTANT, yytext()); }
+"true" { return symbol(sym.True); }
+"false" { return symbol(sym.False); }
 "new" {return symbol(sym.NEW); }
+"float" { return symbol(sym.FLOAT);  }
+"const" { return symbol(sym.CONST); }
 "NewArray" { return symbol(sym.NEWARRAY); }
+"repeat"   { return symbol(sym.REPEAT); }
 "Print" { return symbol(sym.PRINT); }
 "ReadInteger" { return symbol(sym.READINTEGER); }
 "ReadLine" { return symbol(sym.READLINE); }
@@ -70,6 +84,7 @@ StringLiteral = \"[^(\\n|\\r)]~\"
 "class" { return symbol(sym.CLASS); }
 "interface" { return symbol(sym.INTERFACE); }
 "null" { return symbol(sym.NULL); }
+"long" { return symbol(sym.LONG); }
 "NULL" { return symbol(sym.NULL); }
 "dtoi" { return symbol(sym.DTOI); }
 "itod" { return symbol(sym.ITOD); }
@@ -86,7 +101,8 @@ StringLiteral = \"[^(\\n|\\r)]~\"
 "int" { return symbol(sym.INT); }
 "bool" { return symbol(sym.BOOLEAN); }
 "double" { return symbol(sym.DOUBLE); }
-"string" { return symbol(sym.STRING); }
+"string" { return  symbol(sym.STRING); }
+"until"  { return  symbol(sym.UNTIL); }
 "import "     {  return symbol(sym.IMPORT);}
 "__line__"    { return symbol(sym.__LINE__);}
 "function"			 { return symbol(sym.FUNCTION); }
@@ -94,12 +110,20 @@ StringLiteral = \"[^(\\n|\\r)]~\"
 "begin"				 { return symbol(sym.BEGIN); }
 "record"			 { return symbol(sym.RECORD); }
 "end"				   { return symbol(sym.END); }
+"of"           { return symbol(sym.OF); }
+"extern"       { return symbol(sym.EXTERND); }
+"char"         { return symbol(sym.CHAR); }
+"sizeof"       { return symbol(sym.SIZEOF); }
+"default"      { return symbol(sym.DEFAULT); }
+"case"         {return symbol(sym.CASE);}
+"switch"       {return symbol(sym.SWITCH);}
+"auto"         {return symbol(sym.AUTO);} 
 /*******Define method*********/
 // "Define "[:jletter:] [:jletterdigit:]* {methode = yytext().substring(5);}
 
 
 /******BOOLEANLITERAL********/
-{BOOLEANLITERAL} {return token( Sym.T_BOOLEANLITERAL, yytext() );}
+// {BOOLEANLITERAL} {return token( Sym.T_BOOLEANLITERAL, yytext() );}
 
 
 /*******Identification*******/
@@ -107,62 +131,67 @@ StringLiteral = \"[^(\\n|\\r)]~\"
 
 
 /*******DOUBLELITERAL*******/
-{DOUBLELITERAL} { text = text.concat("T_DOUBLELITERAL "+yytext()+"\n");}
-[0-9]+\.[0-9]* { text = text.concat("T_DOUBLELITERAL "+yytext()+"\n");}
+{DOUBLELITERAL} { return symbol(sym.DOUBLECONST, yytext()); }
+[0-9]+\.[0-9]* { return symbol(sym.DOUBLECONST, yytext()); }
 
 /********INTLITERAL*********/
 {DecIntegerLiteral} { return symbol(sym.INTCONST, new Integer(yytext())); }
-{HexIntegerLiteral} { return symbol (sym.INTCONSTANT, yytext()); }
+{HexIntegerLiteral} { return symbol (sym.INTCONST, yytext()); }
 
+/**********FLOAT***********/
+{Float} { return symbol(sym.FLOATCONST, new Double(yytext())); }
+{SciFloat} { return symbol(sym.FLOATCONST, new Double(yytext())); }
 
 /********OPERATOR***********/
-
-"+" { return symbol(sym.PLUS); }
-"-" { return symbol(sym.MINUS); }
-"*" { return symbol(sym.MULT); }
-"/" { return symbol(sym.DIV); }
-"%" { return symbol(sym.MOD); }
-"=" { return symbol(sym.ASSIGN); }
-"==" { return symbol(sym.EQEQ); }
-"!=" { return symbol(sym.NOTEQ); }
-"<" { return symbol(sym.LT); }
-"<=" { return symbol (sym.LTEQ); }
-">" { return symbol(sym.GT); }
-">=" { return symbol(sym.GTEQ); }
-"&&" { return symbol (sym.ANDAND); }
-"||" { return symbol (sym.OROR);}
-"!" { return symbol (sym.NOT); }
-";" { return symbol(sym.SEMICOLON); }
-"," { return symbol(sym.COMMA); }
-"." {return symbol (sym.DOT); }
-"[" { return symbol (sym.LEFTBRACK); }
-"]" { return symbol (sym.RIGHTBRACK); }
-"(" { return symbol (sym.LEFTPAREN); }
-")" { return symbol (sym.RIGHTPAREN); }
-"{" { return symbol (sym.LEFTAKULAD); }
-"}" { return symbol (sym.RIGHTAKULAD); }
-"++"{ return symbol(sym.INC); }
-"--"{ return symbol(sym.DEC); }
-"-="{ return symbol(sym.SUBASS); }
-"*="{ return symbol(sym.MULTASS); }
-"/="{ return symbol(sym.DIVASS); }
-"not"{ return symbol(sym.NOT); }
-"~"	{ return symbol(sym.BITNEG); }
-"&"	{ return symbol(sym.ARITHAND); }
-"and"{ return symbol(sym.LOGICAND); }
-"|"	{ return symbol(sym.ARITHOR); }
-"or"{ return symbol(sym.LOGICOR); }
-"^"{ return symbol(sym.XOR); }
-"+="{ return symbol(sym.ADDASS); }
-":"{ return symbol(sym.COLON); }
+"+"   { return symbol(sym.PLUS); }
+"-"   { return symbol(sym.MINUS); }
+"*"   { return symbol(sym.MULT); }
+"/"   { return symbol(sym.DIV); }
+"%"   { return symbol(sym.MOD); }
+"="   { return symbol(sym.ASSIGN); }
+"=="  { return symbol(sym.EQEQ); }
+"!="  { return symbol(sym.NOTEQ); }
+"<"   { return symbol(sym.LT); }
+"<="  { return symbol (sym.LTEQ); }
+">"   { return symbol(sym.GT); }
+">="  { return symbol(sym.GTEQ); }
+"&&"  { return symbol (sym.ANDAND); }
+"|"	  { return symbol(sym.ARITHOR); }
+"or"  { return symbol(sym.LOGICOR); }
+"||"  { return symbol (sym.OROR);}
+"!"   { return symbol (sym.LOGICSIGHN); }
+";"   { return symbol(sym.SEMICOLON); }
+","   { return symbol(sym.COMMA); }
+"."   {return symbol (sym.DOT); }
+"["   { return symbol (sym.LEFTBRACK); }
+"]"   { return symbol (sym.RIGHTBRACK); }
+"("   { return symbol (sym.LEFTPAREN); }
+")"   { return symbol (sym.RIGHTPAREN); }
+"{"   { return symbol (sym.LEFTAKULAD); }
+"}"   { return symbol (sym.RIGHTAKULAD); }
+"++"  { return symbol(sym.INC); } //increase
+"--"  { return symbol(sym.DEC); } //decrease
+"+="  { return symbol(sym.ADDASS); }
+"-="  { return symbol(sym.SUBASS); } 
+"*="  { return symbol(sym.MULTASS); }
+"/="  { return symbol(sym.DIVASS); }
+"not" { return symbol(sym.NOT); }
+"~"	  { return symbol(sym.BITNEG); }
+"&"	  { return symbol(sym.ARITHAND); }
+"and" { return symbol(sym.LOGICAND); }
+"^"   { return symbol(sym.XOR); }
+":"   { return symbol(sym.COLON); }
 
 /*********STRING***********/
-\"  {string.setLength(0); yybegin(STRING);}
+\"  { string = new StringBuilder("\""); yybegin(STRING);}
 // "dsfdg"
 }
 
 <STRING> {
-\" {  text = text.concat("T_STRINGLITERAL "+'"'+string.toString()+yytext()+"\n"); yybegin(YYINITIAL); }
+\" {  string.append("\"");
+	    yybegin(YYINITIAL);
+	    return symbol(sym.STRINGCONST, new String(string.toString()));
+      }
 
   \\\' { string.append("\\\'"); }
     \\t { string.append("\\t"); }

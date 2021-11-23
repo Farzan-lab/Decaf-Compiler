@@ -1,35 +1,216 @@
-parser code {:
-    // Connect this parser to a scanner!
-    private mn scanner;
-:}
 
-scan with {: return scanner.next_token(); :}
-/********** TERMINALs **********/ 
-terminal            SEMI, PLUS, MINUS, TIMES, UMINUS, LPAREN, RPAREN;
-terminal Integer    NUMBER;        // our scanner provides numbers as integers
+import java_cup.runtime.*;
 
-terminal String    IDENT;        // our scanner provides numbers as integers
 
+parser code  {:
+  private Lexer lexer;
+  public parser(Lexer lexer){
+    this.lexer = lexer;
+
+  }
+
+
+:};
+
+
+scan with {: return lexer.next_token(); :};
+
+ /********* TERMINALs ***********/
+
+/*keywords*/
+
+terminal THIS;    /* this */
+terminal EXTENDS;   /* extends */
+terminal IMPLEMENTS;    /* implement */
+terminal FOR;   /* for */
+terminal CONTINUE;   /* continue */
+terminal True;    /* true */
+terminal False; /* false */
+terminal NEW;   /* new */
+terminal FLOAT;   /* float */
+terminal CONST;   /* const */
+terminal NEWARRAY;  /* newarray */
+terminal REPEAT;    /* repeat */
+terminal PRINT;     /* print */
+terminal READINTEGER;   /* readinteger*/
+terminal READLINE; /* readline */
+terminal VOID;    /* void */
+terminal ID;
+terminal CLASS;   /* class */
+terminal INTERFACE;   /* interface */
+terminal NULL;    /* null */
+terminal LONG;    /* long */
+terminal DTOI;    /* dtol */
+terminal ITOD;    /* itod */
+terminal BTOI;    /* btoi */
+terminal ITOB;    /* itob */
+terminal PRIVATE; /* private */
+terminal PROTECTED;/* protected */
+terminal WHILE;   /* while */
+terminal IF;    /* if */
+terminal ELSE;   /* else */
+terminal RETURN;  /* return */
+terminal BREAK;   /* break */
+terminal PUBLIC;  /* public */
+terminal INT;   /* int */
+terminal BOOLEAN;   /* bool */
+terminal DOUBLE;    /* double */
+terminal STRING;    /* string */
+terminal UNTIL;     /* until */
+terminal IMPORT;    /* import */
+terminal __LINE__;  /* __line */
+terminal FUNCTION;  /* function */
+terminal __FUNC__;  /* __func__ */
+terminal BEGIN;     /* begin */
+terminal RECORD;    /* record */
+terminal END;       /* end */
+terminal OF;        /* of */
+terminal EXTERND;   /* externd */
+terminal CHAR;      /* char */
+terminal SIZEOF;    /* sizeof */
+terminal DEFAULT;   /* default */
+terminal CASE;    /* case */
+terminal SWITCH;  /* switch */
+terminal AUTO;    /* auto */
+
+
+
+/*operation terminals*/
+
+terminal PLUS;    /* + */
+terminal MINUS;  /* - */
+terminal MULT;  /* * */
+terminal DIV;   /* / */
+terminal MOD;   /* % */
+terminal ASSIGN;    /* = */
+terminal EQEQ;    /* == */
+terminal NOTEQ;   /* != */
+terminal LT;    /* < */
+terminal LTEQ;    /* <= */
+terminal GT;    /* > */
+terminal GTEQ; /* >= */
+terminal ANDAND; /* && */
+terminal OROR;   /* || */
+terminal LOGICSIGHN;   /* ! */
+terminal SEMICOLON;   /* ; */
+terminal COMMA;   /* , */
+terminal DOT;    /* . */
+terminal LEFTBRACK;    /* [ */
+terminal RIGHTBRACK;    /* ] */
+terminal LEFTPAREN;   /* ( */
+terminal RIGHTPAREN;   /* ) */
+terminal LEFTAKULAD;    /* { */
+terminal RIGHTAKULAD;   /* } */
+terminal INC;   /* ++ (increase) */
+terminal DEC;   /* -- (decrease) */
+terminal ADDASS;   /* += */
+terminal SUBASS;   /* -= */
+terminal MULTASS;    /* *= */
+terminal DIVASS;    /* /= */
+terminal NOT; /* not */
+terminal BITNEG;/* ~ */
+terminal ARITHAND;   /* & */
+terminal LOGICAND;   /* and */
+terminal ARITHOR;    /* | */
+terminal LOGICOR;    /* or */
+terminal XOR; /* ^ */
+terminal COLON; /* : */
+
+
+terminal Boolean FALSE, TRUE ;
+// terminal double DOUBLE;
+// terminal Integer NUMBER;       // our scanner provides numbers as integers
+terminal int INTCONST;
+terminal double DOUBLECONST;
+terminal Boolean BOOLCONST; // intConstant, doubleConstant, boolConstant
+terminal String STRINGCONST; // stringConstant     // our scanner provides Strings as identifier
+terminal float FLOATCONST;
 
 
 /********** NON TERMINALs **********/
-non terminal            expr_list;
-non terminal Integer    expr;      // used to store evaluated subexpressions
 
-/* Precedences */
+non terminal    expr,stmt;
+// non terminal Integer    expr; 
+
+non terminal    For_state;    // for statement
+non terminal    While_state;  // while statement
+
+non terminal    if_state;  // if statement
+
+non terminal    break_state;  // break statement
+non terminal    continue_state;  // continue statement
+non terminal    return_state;  // return statement  
+
+non terminal    Type_state;  // type statement
+
+non terminal    Call_state; //  call statement
+
+non terminal    constant_state; //constant statement 
+
+
+// non terminal    While_state;
+
+// non terminal    While_state;
+
+// non terminal    While_state;
+
+// non terminal    While_state;
+
+// non terminal    While_state;
+
+// non terminal    While_state;
+
+// non terminal    While_state;
+
+// non terminal    While_state;
+
+// non terminal    While_state;
+
+
+
+/********** PRECEDENCES **********/
+
+precedence left COMMA;
+precedence right ASSIGN, ADDASS, SUBASS, MULTASS, DIVASS;
+precedence left LOGICOR;
+precedence left LOGICAND;
+precedence left ARITHOR;
+precedence left XOR;
+precedence left ARITHAND;
+precedence left EQEQ, NOTEQ;
+precedence left LT, LTEQ, GT, GTEQ;
 precedence left PLUS, MINUS;
-precedence left TIMES;
-precedence left UMINUS;
+precedence left MULT, DIV, MOD;
+precedence right NOT, BITNEG, SIZEOF;
+precedence nonassoc LEFTPAREN, RIGHTPAREN;
 
-/* The grammar rules */
-expr_list ::= expr_list expr:e SEMI         {: System.out.println(e);:}
-            | expr:e SEMI                   {: System.out.println(e);:}
-;
-expr      ::= expr:e1 PLUS  expr:e2         
-             | expr:e1 MINUS expr:e2        {: RESULT = e1-e2;       :}
-             | expr:e1 TIMES expr:e2        {: RESULT = e1*e2;       :}
-             | MINUS expr:e                 {: RESULT = -e;          :}
-  	     %prec UMINUS
-       | LPAREN expr:e RPAREN	         {: RESULT = e;           :}
-       | NUMBER:n	                     {: RESULT = n;           :}
-             ;
+/******* THE GRAMMER RULEs *******/
+
+stmt ::= stmt expr SEMICOLON
+            | expr SEMICOLON  ;
+
+expr      ::= expr PLUS  expr
+             | expr MINUS expr
+             | expr MULT expr
+             | expr DIV expr
+             | INTCONST
+             |FLOATCONST
+             |DOUBLECONST;
+
+
+
+
+
+
+type ::=
+    INTCONST
+    | BOOLCONST
+    | FLOAT
+    // | LONG
+    // | CHARC
+    | DOUBLECONST
+    | STRINGCONST
+    | VOID
+    | AUTO
+    | ID
+    ;
