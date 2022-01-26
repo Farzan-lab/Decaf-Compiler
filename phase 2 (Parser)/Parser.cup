@@ -8,38 +8,37 @@ parser code  {:
     this.lexer = lexer;
 
   }
-
-
 :};
 
 
 scan with {: return lexer.next_token(); :};
 
+
  /********* TERMINALs ***********/
 
 /*keywords*/
-
 terminal THIS;    /* this */
 terminal EXTENDS;   /* extends */
 terminal IMPLEMENTS;    /* implement */
 terminal FOR;   /* for */
 terminal CONTINUE;   /* continue */
-terminal True;    /* true */
-terminal False; /* false */
 terminal NEW;   /* new */
 terminal FLOAT;   /* float */
 terminal CONST;   /* const */
 terminal NEWARRAY;  /* newarray */
 terminal REPEAT;    /* repeat */
+terminal FOREACH;   /* foreach*/
 terminal PRINT;     /* print */
 terminal READINTEGER;   /* readinteger*/
 terminal READLINE; /* readline */
 terminal VOID;    /* void */
-terminal ID;
+terminal ID;      /* ID */
 terminal CLASS;   /* class */
 terminal INTERFACE;   /* interface */
 terminal NULL;    /* null */
 terminal LONG;    /* long */
+terminal INC ;    /* ++ */
+terminal DEC;     /* -- */
 terminal DTOI;    /* dtol */
 terminal ITOD;    /* itod */
 terminal BTOI;    /* btoi */
@@ -53,7 +52,6 @@ terminal RETURN;  /* return */
 terminal BREAK;   /* break */
 terminal PUBLIC;  /* public */
 terminal INT;   /* int */
-terminal BOOLEAN;   /* bool */
 terminal DOUBLE;    /* double */
 terminal STRING;    /* string */
 terminal UNTIL;     /* until */
@@ -72,9 +70,9 @@ terminal DEFAULT;   /* default */
 terminal CASE;    /* case */
 terminal SWITCH;  /* switch */
 terminal AUTO;    /* auto */
-
-
-
+terminal IN;
+terminal BOOL;
+terminal BRACKETS;     // brakets should be a terminal becuase leftvalue has r/r confilict with possible types
 /*operation terminals*/
 
 terminal PLUS;    /* + */
@@ -101,8 +99,6 @@ terminal LEFTPAREN;   /* ( */
 terminal RIGHTPAREN;   /* ) */
 terminal LEFTAKULAD;    /* { */
 terminal RIGHTAKULAD;   /* } */
-terminal INC;   /* ++ (increase) */
-terminal DEC;   /* -- (decrease) */
 terminal ADDASS;   /* += */
 terminal SUBASS;   /* -= */
 terminal MULTASS;    /* *= */
@@ -115,59 +111,92 @@ terminal ARITHOR;    /* | */
 terminal LOGICOR;    /* or */
 terminal XOR; /* ^ */
 terminal COLON; /* : */
+terminal EXTERN;
 
-
-terminal Boolean FALSE, TRUE ;
-// terminal double DOUBLE;
-// terminal Integer NUMBER;       // our scanner provides numbers as integers
-terminal int INTCONST;
-terminal double DOUBLECONST;
-terminal Boolean BOOLCONST; // intConstant, doubleConstant, boolConstant
-terminal String STRINGCONST; // stringConstant     // our scanner provides Strings as identifier
-terminal float FLOATCONST;
-
-
+// terminals for boolean , double , float , int , char , string;
+terminal  String BOOLEANCONST;
+terminal  String INTCONST;
+terminal  String DOUBLECONST;
+terminal  String STRINGCONST; // stringConstant     // our scanner provides Strings as identifier
+terminal  String FLOATCONST;
+terminal  String CHARCONST;
+terminal  String LONGCONST;
 /********** NON TERMINALs **********/
 
-non terminal    expr,stmt;
-// non terminal Integer    expr; 
+non terminal    stmt;
+non terminal    expr;
+// Loops
+non terminal    for_state;
+non terminal    while_state;  // while statement
 
-non terminal    For_state;    // for statement
-non terminal    While_state;  // while statement
-
-non terminal    if_state;  // if statement
+// if , if and else 
+non terminal    if_one_action_state;    // with no 'else'
+non terminal    if_multi_actoin_state; // with no 'else'
+non terminal    if_one_action_with_else_state;
+non terminal    if_multi_actoin_with_else_state;
 
 non terminal    break_state;  // break statement
 non terminal    continue_state;  // continue statement
 non terminal    return_state;  // return statement  
 
-non terminal    Type_state;  // type statement
+non terminal    type_state;  // type statement
 
 non terminal    Call_state; //  call statement
+non terminal    cond_stmt ;
+non terminal    loop_stmt ;
+non terminal    constant_state; //constant statement
 
-non terminal    constant_state; //constant statement 
-
-
-// non terminal    While_state;
-
-// non terminal    While_state;
-
-// non terminal    While_state;
-
-// non terminal    While_state;
-
-// non terminal    While_state;
-
-// non terminal    While_state;
-
-// non terminal    While_state;
-
-// non terminal    While_state;
-
-// non terminal    While_state;
-
-
-
+// OPERATIONS
+non terminal    expr_with_operation;
+non terminal    more_expr;
+non terminal    expr_plus;
+// Declarations (xxxx_dcl)
+non terminal     declarations;
+non terminal     brakets;
+// Varaible: INT, DOUBLE, STRING, BOOLEAN, IDENTIFIER(id) 
+non terminal  variable_dcl;
+non terminal  func_dcl;
+non terminal  class_dcl;
+non terminal  extend_dcl;
+non terminal  implement_dcl;
+non terminal  interface_dcl;
+non terminal  possible_type;
+non terminal  optional_extend;
+non terminal  block;
+non terminal  block_par;
+non terminal  Program;
+non terminal  Structure;
+non terminal  Leftvalue;
+non terminal  constant_val;
+non terminal  method_call;
+non terminal  Prototype;
+non terminal  Formals;
+non terminal  FormalsMore;
+non terminal  type_args;
+non terminal  statements;
+non terminal  parameters;
+non terminal  assignment;
+non terminal  modes;
+non terminal  while_if_multi_actoin_state;
+non terminal  BreakStmt;
+non terminal  PrintStmt;
+non terminal  ReturnStmt;
+non terminal  func_extern;
+non terminal  extern_dcl;
+non terminal  Pars;
+non terminal  Fields;
+non terminal  Field;
+non terminal  StmtBlock;
+non terminal variable_dcl_plus;
+non terminal var_dcl_end;
+non terminal var_dcl_cnt;
+non terminal If_then_statement;
+non terminal Statement_no_short_if ;
+non terminal If_then_else_statement;
+non terminal While_statement_no_short_if ;
+non terminal ForStmt;
+non terminal WhileStmt;
+non terminal If_then_statement_multi_task ;
 /********** PRECEDENCES **********/
 
 precedence left COMMA;
@@ -185,32 +214,240 @@ precedence right NOT, BITNEG, SIZEOF;
 precedence nonassoc LEFTPAREN, RIGHTPAREN;
 
 /******* THE GRAMMER RULEs *******/
+// Start with program
 
-stmt ::= stmt expr SEMICOLON
-            | expr SEMICOLON  ;
+Program ::= Structure;
 
-expr      ::= expr PLUS  expr
-             | expr MINUS expr
-             | expr MULT expr
-             | expr DIV expr
-             | INTCONST
-             |FLOATCONST
-             |DOUBLECONST;
+Structure ::= declarations Structure 
+            | declarations;
 
 
+// experations( with out inc and dec)
+expr        ::= expr_with_operation 
+              | LEFTPAREN expr RIGHTPAREN
+              | Leftvalue
+              | ITOD LEFTPAREN expr RIGHTPAREN 
+              | DTOI LEFTPAREN expr RIGHTPAREN 
+              | ITOB LEFTPAREN expr RIGHTPAREN 
+              | BTOI LEFTPAREN expr RIGHTPAREN
+              | constant_val
+              | method_call
+              | BITNEG expr
+              | SIZEOF LEFTPAREN possible_type RIGHTPAREN
+              | MINUS expr 
+              | PLUS expr 
+              | Call_state
+              | THIS
+              | NOT expr  
+              | READINTEGER LEFTPAREN RIGHTPAREN 
+              | READLINE LEFTPAREN RIGHTPAREN 
+              | NEW ID 
+              | NEWARRAY LEFTPAREN expr COMMA possible_type RIGHTPAREN;
+
+Call_state   ::= ID LEFTPAREN expr RIGHTPAREN
+               | expr DOT ID LEFTPAREN expr RIGHTPAREN
+               | expr DOT ID LEFTPAREN  RIGHTPAREN;
+
+constant_val     ::= INTCONST
+                | DOUBLECONST
+                | CHARCONST:c
+                | BOOLEANCONST
+                | STRINGCONST
+                | LONGCONST
+                | FLOATCONST
+                | NULL;
+
+// operations
+expr_with_operation     ::= expr PLUS  expr
+                          | expr MINUS expr
+                          | expr MULT expr
+                          | expr DIV expr
+                          | expr MOD expr
+                          | expr EQEQ expr
+                          | expr LOGICOR expr
+                          | expr LOGICAND expr
+                          | expr XOR expr
+                          | expr GT expr
+                          | expr GTEQ expr
+                          | expr LT expr
+                          | expr LTEQ expr
+                          | expr ASSIGN expr
+                          | expr NOTEQ expr
+                          | expr NOT expr
+                          |expr ARITHAND expr
+                          |expr ARITHOR expr;
 
 
 
+/********** Declaration **********/
+declarations    ::= variable_dcl 
+                  | func_dcl
+                  | class_dcl
+                  | extend_dcl
+                  | implement_dcl
+                  | interface_dcl;
 
-type ::=
-    INTCONST
-    | BOOLCONST
-    | FLOAT
-    // | LONG
-    // | CHARC
-    | DOUBLECONST
-    | STRINGCONST
-    | VOID
-    | AUTO
-    | ID
-    ;
+interface_dcl ::= INTERFACE ID LEFTAKULAD Prototype RIGHTAKULAD;
+Prototype ::= possible_type ID LEFTPAREN Formals RIGHTBRACK SEMICOLON Prototype| ;
+Formals ::= possible_type ID FormalsMore | ;
+FormalsMore ::= COMMA possible_type ID FormalsMore | ;
+/****** Variable decleration ******/
+variable_dcl   ::= possible_type var_dcl_cnt:vdc var_dcl_end SEMICOLON
+                 | CONST possible_type var_dcl_cnt:vdc var_dcl_end SEMICOLON
+	               | possible_type var_dcl_cnt SEMICOLON
+	               | CONST possible_type var_dcl_cnt SEMICOLON;
+    
+
+var_dcl_end ::=
+    var_dcl_end COMMA ID
+    | var_dcl_end COMMA ID ASSIGN expr
+    | ID LEFTBRACK INTCONST RIGHTBRACK
+    | COMMA var_dcl_cnt:vdc;
+
+var_dcl_cnt ::= ID
+              | ID ASSIGN expr
+              | ID LEFTBRACK INTCONST RIGHTBRACK;
+
+/******* possible Types ********/
+possible_type   ::= INT
+                   | FLOAT
+                   | DOUBLE
+                   | STRING
+                   | BOOL
+                   | ID
+                   | AUTO
+                   | NULL;
+
+/***** functions decleration *****/
+func_extern     ::= func_dcl
+                  | extern_dcl;
+
+func_dcl        ::= possible_type ID LEFTPAREN RIGHTPAREN SEMICOLON
+                  | possible_type ID LEFTPAREN type_args RIGHTPAREN SEMICOLON
+                  | possible_type ID LEFTPAREN type_args RIGHTPAREN block
+                  | VOID ID LEFTPAREN RIGHTPAREN block;
+
+extern_dcl ::=
+    EXTERN possible_type ID;
+
+
+type_args       ::= possible_type ID
+                  | possible_type ID brakets
+                  | type_args COMMA possible_type ID
+                  | type_args COMMA possible_type ID brakets;
+
+brakets         ::= BRACKETS | brakets BRACKETS;
+
+block           ::= LEFTAKULAD block_par RIGHTAKULAD
+                  | LEFTAKULAD RIGHTAKULAD;
+
+
+block_par       ::= block_par statements
+                  | block_par variable_dcl
+                  | statements 
+                  | variable_dcl;
+
+
+statements      ::= Leftvalue ASSIGN expr SEMICOLON
+                  | method_call SEMICOLON
+                  | cond_stmt
+                  | loop_stmt
+                  | RETURN SEMICOLON
+                  | RETURN expr SEMICOLON
+                  | BREAK SEMICOLON
+                  | PRINT LEFTPAREN expr RIGHTPAREN SEMICOLON
+                  | PRINT LEFTPAREN  RIGHTPAREN SEMICOLON
+                  | Leftvalue SEMICOLON
+                  | Leftvalue ADDASS expr SEMICOLON
+                  | Leftvalue MULTASS expr SEMICOLON
+                  | Leftvalue SUBASS expr  SEMICOLON
+                  | Leftvalue DIVASS expr  SEMICOLON
+                  | CONTINUE SEMICOLON;
+
+assignment     ::= Leftvalue ASSIGN expr
+                  | Leftvalue ADDASS expr 
+                  | Leftvalue MULTASS expr 
+                  | Leftvalue SUBASS expr  
+                  | Leftvalue DIVASS expr;  
+
+Leftvalue       ::= ID
+                  | expr DOT ID 
+                  | expr  LEFTBRACK expr RIGHTBRACK;
+
+method_call        ::= ID LEFTPAREN RIGHTPAREN
+                     | ID LEFTPAREN parameters RIGHTPAREN;
+
+
+parameters        ::= expr
+                    | parameters COMMA expr
+                    | expr_plus;
+
+
+
+/****** class decleration ******/
+class_dcl    ::= CLASS ID Pars LEFTAKULAD Fields RIGHTAKULAD ;
+
+Pars         ::= extend_dcl | ;
+
+Fields        ::= Fields:f Field  | ;
+
+Field        ::= variable_dcl | func_dcl ;
+
+StmtBlock    ::= LEFTAKULAD variable_dcl statements RIGHTAKULAD ;
+
+variable_dcl_plus     ::= variable_dcl_plus variable_dcl | ;
+
+optional_extend   ::= extend_dcl|  ; // it can be null
+
+/****** extends decleration ******/
+extend_dcl      ::= EXTENDS ID;
+
+modes           ::=  PRIVATE 
+                   | PROTECTED
+                   | PUBLIC
+                   | VOID ;
+
+
+// Statement_no_short_if     ::= expr SEMICOLON 
+//                             | SEMICOLON 
+//                             | While_statement_no_short_if
+//                             | If_then_else_statement_no_short_if
+//                             | For_statement_no_short_if
+//                             | BreakStmt
+//                             | ReturnStmt
+//                             | PrintStmt 
+//                             | block ;
+
+
+// If_then_else_statement_no_short_if ::= IF LEFTPAREN expr RIGHTPAREN Statement_no_short_if ELSE Statement_no_short_if;
+// While_statement_no_short_if ::= WHILE LEFTPAREN expr RIGHTPAREN Statement_no_short_if ;
+// For_statement_no_short_if ::= FOR LEFTPAREN expr SEMICOLON expr SEMICOLON expr RIGHTPAREN Statement_no_short_if
+                            // | FOR LEFTPAREN  SEMICOLON expr SEMICOLON expr RIGHTPAREN Statement_no_short_if
+                            // | FOR LEFTPAREN expr SEMICOLON expr SEMICOLON  RIGHTPAREN Statement_no_short_if
+                            // | FOR LEFTPAREN  SEMICOLON expr SEMICOLON  RIGHTPAREN Statement_no_short_if;
+
+loop_stmt ::= WhileStmt
+            | ForStmt;
+
+WhileStmt    ::= WHILE LEFTPAREN expr RIGHTPAREN statements;
+ForStmt      ::= FOR LEFTPAREN expr SEMICOLON expr SEMICOLON expr RIGHTPAREN statements
+               | FOR LEFTPAREN  SEMICOLON expr SEMICOLON expr RIGHTPAREN statements
+               | FOR LEFTPAREN  SEMICOLON expr SEMICOLON  RIGHTPAREN statements
+               | FOR LEFTPAREN expr SEMICOLON expr SEMICOLON  RIGHTPAREN statements;
+
+If_then_statement ::=   IF LEFTPAREN expr RIGHTPAREN statements ;
+If_then_statement_multi_task  ::=   IF LEFTPAREN expr RIGHTPAREN LEFTAKULAD statements RIGHTAKULAD;
+If_then_else_statement ::= IF LEFTPAREN expr RIGHTPAREN Statement_no_short_if ELSE statements ;
+
+ cond_stmt         ::= If_then_else_statement
+                     | If_then_statement_multi_task 
+                     | If_then_statement;
+
+ReturnStmt          ::= RETURN expr SEMICOLON
+                      | RETURN SEMICOLON;
+
+BreakStmt           ::= BREAK SEMICOLON;
+
+ContinueStmt        ::= CONTINUE SEMICOLON;
+
+PrintStmt           ::= PRINT LEFTPAREN expr RIGHTPAREN SEMICOLON;

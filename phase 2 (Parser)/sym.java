@@ -6,105 +6,107 @@
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int READLINE = 16;
-  public static final int GT = 65;
+  public static final int BOOL = 56;
+  public static final int READLINE = 15;
+  public static final int GT = 68;
   public static final int IMPLEMENTS = 4;
-  public static final int CONST = 11;
-  public static final int ITOD = 24;
-  public static final int True = 7;
-  public static final int NOTEQ = 62;
-  public static final int ITOB = 26;
-  public static final int ARITHAND = 87;
+  public static final int CONST = 9;
+  public static final int ITOD = 25;
+  public static final int NOTEQ = 65;
+  public static final int ITOB = 27;
+  public static final int ARITHAND = 88;
   public static final int FLOATCONST = 99;
   public static final int UNTIL = 39;
-  public static final int LEFTAKULAD = 77;
+  public static final int LEFTAKULAD = 80;
   public static final int SIZEOF = 50;
-  public static final int COMMA = 71;
-  public static final int ARITHOR = 89;
-  public static final int DIVASS = 84;
-  public static final int ADDASS = 81;
-  public static final int LT = 63;
-  public static final int ANDAND = 67;
-  public static final int OROR = 68;
+  public static final int COMMA = 74;
+  public static final int ARITHOR = 90;
+  public static final int DIVASS = 85;
+  public static final int ADDASS = 82;
+  public static final int LT = 66;
+  public static final int ANDAND = 70;
+  public static final int CHARCONST = 100;
+  public static final int OROR = 71;
   public static final int DOUBLE = 37;
-  public static final int PROTECTED = 28;
-  public static final int FALSE = 93;
-  public static final int NOT = 85;
+  public static final int BOOLEANCONST = 95;
+  public static final int PROTECTED = 29;
+  public static final int NOT = 86;
   public static final int __FUNC__ = 43;
-  public static final int DEC = 80;
-  public static final int FLOAT = 10;
-  public static final int INTCONST = 95;
+  public static final int DEC = 23;
+  public static final int FLOAT = 8;
+  public static final int INTCONST = 96;
   public static final int RECORD = 45;
-  public static final int READINTEGER = 15;
-  public static final int LOGICAND = 88;
-  public static final int RIGHTBRACK = 74;
-  public static final int MOD = 59;
-  public static final int CLASS = 19;
-  public static final int RIGHTPAREN = 76;
+  public static final int READINTEGER = 14;
+  public static final int LOGICAND = 89;
+  public static final int RIGHTBRACK = 77;
+  public static final int MOD = 62;
+  public static final int CLASS = 18;
+  public static final int BRACKETS = 57;
+  public static final int RIGHTPAREN = 79;
   public static final int __LINE__ = 41;
-  public static final int TRUE = 94;
-  public static final int LONG = 22;
-  public static final int PLUS = 55;
-  public static final int WHILE = 29;
+  public static final int LONG = 21;
+  public static final int PLUS = 58;
+  public static final int WHILE = 30;
   public static final int EXTENDS = 3;
-  public static final int MULTASS = 83;
-  public static final int ASSIGN = 60;
-  public static final int INTERFACE = 20;
+  public static final int MULTASS = 84;
+  public static final int ASSIGN = 63;
+  public static final int INTERFACE = 19;
   public static final int CHAR = 49;
-  public static final int BOOLEAN = 36;
-  public static final int DOUBLECONST = 96;
+  public static final int DOUBLECONST = 97;
   public static final int SWITCH = 53;
   public static final int FOR = 5;
-  public static final int VOID = 17;
-  public static final int DIV = 58;
-  public static final int PUBLIC = 34;
-  public static final int RETURN = 32;
-  public static final int MULT = 57;
-  public static final int ELSE = 31;
-  public static final int BREAK = 33;
-  public static final int GTEQ = 66;
-  public static final int DOT = 72;
-  public static final int INT = 35;
-  public static final int BOOLCONST = 97;
-  public static final int NULL = 21;
-  public static final int EQEQ = 61;
+  public static final int EXTERN = 94;
+  public static final int VOID = 16;
+  public static final int DIV = 61;
+  public static final int PUBLIC = 35;
+  public static final int RETURN = 33;
+  public static final int MULT = 60;
+  public static final int ELSE = 32;
+  public static final int BREAK = 34;
+  public static final int GTEQ = 69;
+  public static final int DOT = 75;
+  public static final int INT = 36;
+  public static final int NULL = 20;
+  public static final int EQEQ = 64;
+  public static final int SEMICOLON = 73;
   public static final int EOF = 0;
-  public static final int SEMICOLON = 70;
   public static final int THIS = 2;
   public static final int DEFAULT = 51;
-  public static final int PRINT = 14;
+  public static final int PRINT = 13;
   public static final int FUNCTION = 42;
-  public static final int SUBASS = 82;
-  public static final int INC = 79;
-  public static final int REPEAT = 13;
+  public static final int SUBASS = 83;
+  public static final int INC = 22;
+  public static final int REPEAT = 11;
   public static final int IMPORT = 40;
-  public static final int LOGICSIGHN = 69;
-  public static final int MINUS = 56;
-  public static final int LTEQ = 64;
+  public static final int LOGICSIGHN = 72;
+  public static final int MINUS = 59;
+  public static final int LONGCONST = 101;
+  public static final int LTEQ = 67;
+  public static final int IN = 55;
   public static final int error = 1;
-  public static final int False = 8;
   public static final int CONTINUE = 6;
-  public static final int BITNEG = 86;
-  public static final int IF = 30;
-  public static final int ID = 18;
-  public static final int LEFTBRACK = 73;
+  public static final int BITNEG = 87;
+  public static final int IF = 31;
+  public static final int ID = 17;
+  public static final int LEFTBRACK = 76;
   public static final int OF = 47;
   public static final int END = 46;
-  public static final int COLON = 92;
+  public static final int COLON = 93;
   public static final int EXTERND = 48;
-  public static final int LEFTPAREN = 75;
+  public static final int LEFTPAREN = 78;
+  public static final int FOREACH = 12;
   public static final int BEGIN = 44;
   public static final int CASE = 52;
-  public static final int RIGHTAKULAD = 78;
-  public static final int BTOI = 25;
-  public static final int NEW = 9;
+  public static final int RIGHTAKULAD = 81;
+  public static final int BTOI = 26;
+  public static final int NEW = 7;
   public static final int STRING = 38;
-  public static final int NEWARRAY = 12;
+  public static final int NEWARRAY = 10;
   public static final int STRINGCONST = 98;
-  public static final int DTOI = 23;
-  public static final int LOGICOR = 90;
-  public static final int PRIVATE = 27;
-  public static final int XOR = 91;
+  public static final int DTOI = 24;
+  public static final int LOGICOR = 91;
+  public static final int PRIVATE = 28;
+  public static final int XOR = 92;
   public static final int AUTO = 54;
   public static final String[] terminalNames = new String[] {
   "EOF",
@@ -114,13 +116,12 @@ public class sym {
   "IMPLEMENTS",
   "FOR",
   "CONTINUE",
-  "True",
-  "False",
   "NEW",
   "FLOAT",
   "CONST",
   "NEWARRAY",
   "REPEAT",
+  "FOREACH",
   "PRINT",
   "READINTEGER",
   "READLINE",
@@ -130,6 +131,8 @@ public class sym {
   "INTERFACE",
   "NULL",
   "LONG",
+  "INC",
+  "DEC",
   "DTOI",
   "ITOD",
   "BTOI",
@@ -143,7 +146,6 @@ public class sym {
   "BREAK",
   "PUBLIC",
   "INT",
-  "BOOLEAN",
   "DOUBLE",
   "STRING",
   "UNTIL",
@@ -162,6 +164,9 @@ public class sym {
   "CASE",
   "SWITCH",
   "AUTO",
+  "IN",
+  "BOOL",
+  "BRACKETS",
   "PLUS",
   "MINUS",
   "MULT",
@@ -186,8 +191,6 @@ public class sym {
   "RIGHTPAREN",
   "LEFTAKULAD",
   "RIGHTAKULAD",
-  "INC",
-  "DEC",
   "ADDASS",
   "SUBASS",
   "MULTASS",
@@ -200,13 +203,14 @@ public class sym {
   "LOGICOR",
   "XOR",
   "COLON",
-  "FALSE",
-  "TRUE",
+  "EXTERN",
+  "BOOLEANCONST",
   "INTCONST",
   "DOUBLECONST",
-  "BOOLCONST",
   "STRINGCONST",
-  "FLOATCONST"
+  "FLOATCONST",
+  "CHARCONST",
+  "LONGCONST"
   };
 }
 
