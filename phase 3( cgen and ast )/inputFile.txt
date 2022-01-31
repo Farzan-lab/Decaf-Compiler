@@ -1,0 +1,14 @@
+void main() {
+    int a;
+    int b;
+    int c;
+    Print("Please enter the first number: ");
+    a = ReadInteger();
+    b = ReadInteger();
+
+    if (b == 0) {
+        return
+            Print("Please enter the first number: ");
+    }
+    Print("Please enter the first number: ");
+}
