@@ -229,6 +229,7 @@ Structure ::= declarations:d Structure:s
                 setRoot((Structure)RESULT);
               :};
 
+identifier ::= Identifier  ::= ID:i {:  RESULT = new objectNode(i); :};
 /* experations( except increase(inc) and decrease(dec)) */
 expr        ::= expr_with_operation 
               | LEFTPAREN expr RIGHTPAREN
@@ -264,7 +265,7 @@ constant_val     ::=INTCONST:i
     	                  {: RESULT = new BaseNode(Nodes_Type.NULL_LITERAL); :}
                     | CHARCONST:c
                         {: RESULT = new CharConst(c); :}
-                    | FALSE
+                    | FALSE 
                         {: RESULT = new BooleanConst(false); :}
                     | TRUE
                         {: RESULT = new BooleanConst(true); :}
@@ -332,24 +333,59 @@ FormalsMore ::= COMMA possible_type ID FormalsMore | ;
 
 
 /****** Variable decleration ******/
-variable_dcl   ::= possible_type var_dcl_cnt:vdc var_dcl_end SEMICOLON
-                 | CONST possible_type var_dcl_cnt:vdc var_dcl_end SEMICOLON
-	               | possible_type var_dcl_cnt SEMICOLON
-	               | CONST possible_type var_dcl_cnt SEMICOLON;
-    
+variable_dcl   ::= possible_type :t var_dcl_cnt:vdc var_dcl_end:vde SEMICOLON
+                  {:
+			                RESULT =  new BaseASTNode(NodeType.VARIABLE_DECLARATION);
+			                RESULT.addChild(t, vdc, vde);
+			                t.setParent(RESULT);
+			                vdc.setParent(RESULT);
+			                vde.setParent(RESULT);
+                  :}
+	                | possible_type var_dcl_cnt SEMICOLON
+                  {:
+                      RESULT =  new BaseASTNode(NodeType.VARIABLE_DECLARATION);
+			                RESULT.addChild(t, vdc);
+		                	t.setParent(RESULT);
+			                vdc.setParent(RESULT);
+                  :}
+                  |CONST type:t var_dcl_cnt:vdc SEMICOLON
+                  |CONST type:t var_dcl_cnt:vdc var_dcl_end:vde SEMICOLON; /*I have no idea for CONST variable_decl.-> farzan*/
 
 var_dcl_end ::=
-    var_dcl_end COMMA ID
-    | var_dcl_end COMMA ID ASSIGN expr
-    | ID LEFTBRACK INTCONST RIGHTBRACK
-    | COMMA var_dcl_cnt:vdc;
+    var_dcl_end:vde COMMA var_dcl_cnt:vdc
+        {:
+			RESULT = vde;
+			RESULT.addChild(vdc);
+			vdc.setParent(RESULT);
+        :}
+    | COMMA var_dcl_cnt:vdc
+        {: RESULT = vdc; :};
 
-
-var_dcl_cnt ::= ID
-              | ID ASSIGN expr
-              | ID LEFTBRACK INTCONST RIGHTBRACK;
-
-
+var_dcl_cnt ::=
+    identifier:i
+        {:
+            RESULT = i;
+        :}
+    | identifier:i ASSIGN expr:e
+        {:
+            RESULT = new BaseASTNode(NodeType.ASSIGN);
+            ASTNode expr = new ExpressionNode();
+            ASTNode v = new BaseASTNode(NodeType.VAR_USE);
+            expr.addChild(v);
+            v.setParent(expr);
+            v.addChild(i);
+            i.setParent(v);
+            RESULT.addChild(expr,e);
+            e.setParent(RESULT);
+            expr.setParent(RESULT);
+        :}
+    | identifier:id LBRACK INTCONST:num RBRACK
+        {:
+            RESULT = new BaseASTNode(NodeType.ARRAY_DECLARATION);
+            Literal l=new IntegerLiteralNode(num);
+            RESULT.addChild(id,l);
+            id.setParent(RESULT);
+        :};
 
 
 /******* possible Types ********/
@@ -370,14 +406,15 @@ possible_type   ::= INT
                   | VOID
                     {: RESULT = new TypeNode(Nodes_Type.VOID, PrimitiveType.VOID); :}
                   | identifier:t
-	                  {: RESULT = t; :};
+	                  {: RESULT = t; :}
+                  | Type:t LEFTBRACK RIGHTBRACK
+                  {: RESULT = new ArrayType( (Type) t, 1 ) :};
 
 /***** functions decleration *****/
 func_extern     ::= func_dcl
                   | extern_dcl;
-
 //start with the most complete decleration.
-func_dcl        ::= FUNCTION type:t identifier:i LPAREN arguments:a RPAREN block:b
+func_dcl        ::= Function_possible_type:t identifier:i LPAREN arguments:a RPAREN block:b
                     {:
 			                  RESULT = new BaseNode(Nodes_Type.METHOD_DECLARATION);
 			                  RESULT.addChild(t, i, a, b);
@@ -387,15 +424,38 @@ func_dcl        ::= FUNCTION type:t identifier:i LPAREN arguments:a RPAREN block
 			                  b.setParent(RESULT);
                     :}
 
-                  | possible_type ID LEFTPAREN type_args RIGHTPAREN SEMICOLON
+                  | Function_possible_type identifier:i LPAREN arguments:a RPAREN block:b
                     {:
-                        RESULT = new BaseNode()
+			                  RESULT = new BaseASTNode(NodeType.METHOD_DECLARATION);
+		                  	RESULT.addChild(t, i, a, b);
+			                  t.setParent(RESULT);
+			                  i.setParent(RESULT);
+			                  a.setParent(RESULT);
+			                  b.setParent(RESULT);
                     :}
-                  | possible_type ID LEFTPAREN type_args RIGHTPAREN block
-                  | VOID ID LEFTPAREN RIGHTPAREN block;
+                  | Function_possible_type:t identifier:i LPAREN RPAREN block:b
+                    {:
+			                  RESULT = new BaseASTNode(NodeType.METHOD_DECLARATION);
+			                  ASTNode a = new BaseASTNode(NodeType.ARGUMENTS);
+			                  RESULT.addChild(t, i, a, b);
+			                  t.setParent(RESULT);
+                        i.setParent(RESULT);
+                        a.setParent(RESULT);
+                        b.setParent(RESULT);
+                    :};
 
-extern_dcl ::=
-    EXTERN possible_type ID;
+Function_possible_type ::=  modes
+                           |possible_type
+                           | {: RESULT = new EmptyNode(); :}; /*epsilon*/
+
+
+extern_dcl ::= EXTERN type:t identifier:i
+               {:
+			            RESULT = new BaseASTNode(NodeType.VARIABLE_DECLARATION);
+			            RESULT.addChild(t, i);
+			            t.setParent(RESULT);
+			            i.setParent(RESULT);
+               :};
 
 
 type_args       ::= possible_type ID
@@ -405,15 +465,23 @@ type_args       ::= possible_type ID
 
 brakets         ::= BRACKETS | brakets BRACKETS;
 
-block           ::= LEFTAKULAD variable_dcl RIGHTAKULAD
-                  | LEFTAKULAD statements RIGHTAKULAD
+/****** Block ******/
+block           ::= LEFTAKULAD variable_dcl:vcl RIGHTAKULAD
+                  {:
+                        RESULT = new SimpleNode(NodeType.BLOCK);
+                        RESULT.addChild(v, vcl);
+                        v.setParent(RESULT);
+                        s.setParent(RESULT);
+                  :}
+                  | LEFTAKULAD statements:stmts RIGHTAKULAD 
+                  {:
+                        RESULT = new SimpleNode(NodeType.BLOCK);
+                        RESULT.addChild(v, stmts);
+                        v.setParent(RESULT);
+                        s.setParent(RESULT);
+                  :}
+
                   | LEFTAKULAD RIGHTAKULAD;
-
-
-// block_par       ::= block_par statements
-//                   | block_par variable_dcl
-//                   | statements 
-//                   | variable_dcl;
 
 
 statements      ::= Leftvalue ASSIGN expr SEMICOLON
@@ -452,50 +520,67 @@ parameters        ::= expr
 
 
 
-/****** class decleration ******/
-class_dcl    ::= CLASS ID Pars LEFTAKULAD Fields RIGHTAKULAD ;
-
+/****** Class Decleration ******/
+// i have no idea for class decleration.(class grammer's refrence:zivdar001matin )
+class_dcl    ::=  CLASS identifier:i Pars LEFTAKULAD Fields RIGHTAKULAD ;
 Pars         ::= extend_dcl | ;
-
 Fields        ::= Fields:f Field  | ;
-
-Field        ::= variable_dcl | func_dcl ;
-
+Field        ::= variable_dcl:vdl
+               {: RESULT:vdl  :} 
+               | func_dcl :fdl
+               {: RESULT:fdl  :};
 StmtBlock    ::= LEFTAKULAD variable_dcl statements RIGHTAKULAD ;
-
 variable_dcl_plus     ::= variable_dcl_plus variable_dcl | ;
-
 optional_extend   ::= extend_dcl|  ; // it can be null
 
-/******* extends decleration ******/
+
+/******* Extends Decleration ******/
 extend_dcl      ::= EXTENDS ID;
 modes           ::=  PRIVATE 
                    | PROTECTED
                    | PUBLIC
                    | VOID ;
 
+
+/****** Loop Statement ******/
 loop_stmt ::= WhileStmt
             | ForStmt;
+/*** While ***/
+WhileStmt    ::= WHILE LEFTPAREN Expr:e RIGHTPAREN Stmt:s
+                    {:
+                        RESULT = new SimpleNode(NodeType.WHILE_STATEMENT);
+                        RESULT.addChild(e, s);
+                        e.setParent(RESULT);
+                        s.setParent(RESULT);
+                    :};
+/*** For ***/
+ForStmt      ::= FOR LEFTPAREN expr SEMICOLON expr:exr SEMICOLON expr:exr2 RIGHTPAREN statements:stmts
+               | FOR LEFTPAREN  SEMICOLON expr:exr SEMICOLON expr::exr2 RIGHTPAREN statements:stmts
+               | FOR LEFTPAREN  SEMICOLON expr:exr SEMICOLON  RIGHTPAREN statements:stmts
+               | FOR LEFTPAREN expr:exr SEMICOLON expr:exr2 SEMICOLON  RIGHTPAREN statements:stmts;
 
-WhileStmt    ::= WHILE LEFTPAREN expr RIGHTPAREN statements;
-ForStmt      ::= FOR LEFTPAREN expr SEMICOLON expr SEMICOLON expr RIGHTPAREN statements
-               | FOR LEFTPAREN  SEMICOLON expr SEMICOLON expr RIGHTPAREN statements
-               | FOR LEFTPAREN  SEMICOLON expr SEMICOLON  RIGHTPAREN statements
-               | FOR LEFTPAREN expr SEMICOLON expr SEMICOLON  RIGHTPAREN statements;
+/******* Condition Statement *******/
+cond_stmt         ::= If_then_else_statement
+                     | If_then_statement_multi_task 
+                     | If_then_statement;
 
 If_then_statement ::=   IF LEFTPAREN expr RIGHTPAREN statements ;
 If_then_statement_multi_task  ::=   IF LEFTPAREN expr RIGHTPAREN LEFTAKULAD statements RIGHTAKULAD;
 If_then_else_statement ::= IF LEFTPAREN expr RIGHTPAREN Statement_no_short_if ELSE statements ;
 
- cond_stmt         ::= If_then_else_statement
-                     | If_then_statement_multi_task 
-                     | If_then_statement;
-
-ReturnStmt          ::= RETURN expr SEMICOLON
+/******* Return Statement *******/
+ReturnStmt          ::= RETURN expr:e SEMICOLON
+                      {:
+                          RESULT = new SimpleNode(NodeType.RETURN_STATEMENT);
+                          RESULT.addChild(eon);
+                      :}
                       | RETURN SEMICOLON;
 
+/******** Break Statement *********/
 BreakStmt           ::= BREAK SEMICOLON;
 
+/******** Continue Statement *********/
 ContinueStmt        ::= CONTINUE SEMICOLON;
 
+/******* Print Statement ********/
 PrintStmt           ::= PRINT LEFTPAREN expr RIGHTPAREN SEMICOLON;
