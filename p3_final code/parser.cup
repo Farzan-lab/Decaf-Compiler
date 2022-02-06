@@ -1,0 +1,927 @@
+
+import java_cup.runtime.*;
+
+
+parser code  {:
+  private Lexer lexer;
+  public parser(Lexer lexer){
+    this.lexer = lexer;
+
+  }
+:};
+
+scan with {: return lexer.next_token(); :};
+
+ /********* TERMINALs ***********/
+
+/*keywords*/
+terminal THIS;    /* this */
+terminal EXTENDS;   /* extends */
+terminal IMPLEMENTS;    /* implement */
+terminal FOR;   /* for */
+terminal CONTINUE;   /* continue */
+terminal NEW;   /* new */
+terminal FLOAT;   /* float */
+terminal CONST;   /* const */
+terminal NEWARRAY;  /* newarray */
+terminal REPEAT;    /* repeat */
+terminal FOREACH;   /* foreach*/
+terminal PRINT;     /* print */
+terminal READINTEGER;   /* readinteger*/
+terminal READLINE; /* readline */
+terminal VOID;    /* void */
+terminal ID;      /* ID */
+terminal REALCONST;
+terminal CLASS;   /* class */
+terminal INTERFACE;   /* interface */
+terminal NULL;    /* null */
+terminal DEFINE;   /*define*/
+terminal LONG;    /* long */
+terminal INC ;    /* ++ */
+terminal DEC;     /* -- */
+terminal DTOI;    /* dtol */
+terminal ITOD;    /* itod */
+terminal BTOI;    /* btoi */
+terminal ITOB;    /* itob */
+terminal PRIVATE; /* private */
+terminal PROTECTED;/* protected */
+terminal WHILE;   /* while */
+terminal IF;    /* if */
+terminal FALSE;
+terminal TRUE;
+terminal ELSE;   /* else */
+terminal RETURN;  /* return */
+terminal BREAK;   /* break */
+terminal PUBLIC;  /* public */
+terminal INT;   /* int */
+terminal DOUBLE;    /* double */
+terminal STRING;    /* string */
+terminal UNTIL;     /* until */
+terminal IMPORT;    /* import */
+terminal __LINE__;  /* __line */
+terminal FUNCTION;  /* function */
+terminal __FUNC__;  /* __func__ */
+terminal BEGIN;     /* begin */
+terminal RECORD;    /* record */
+terminal END;       /* end */
+terminal OF;        /* of */
+terminal CHAR;      /* char */
+terminal SIZEOF;    /* sizeof */
+terminal DEFAULT;   /* default */
+terminal CASE;    /* case */
+terminal SWITCH;  /* switch */
+terminal IN;
+terminal BOOL;
+terminal BRACKETS;     // brakets should be a terminal becuase leftvalue has r/r confilict with possible types
+/*operation terminals*/
+
+terminal PLUS;    /* + */
+terminal MINUS;  /* - */
+terminal MULT;  /* * */
+terminal DIV;   /* / */
+terminal MOD;   /* % */
+terminal ASSIGN;    /* = */
+terminal EQEQ;    /* == */
+terminal NOTEQ;   /* != */
+terminal LT;    /* < */
+terminal LTEQ;    /* <= */
+terminal GT;    /* > */
+terminal GTEQ; /* >= */
+terminal ANDAND; /* && */
+terminal OROR;   /* || */
+terminal LOGICSIGHN;   /* ! */
+terminal SEMICOLON;   /* ; */
+terminal COMMA;   /* , */
+terminal DOT;    /* . */
+terminal LEFTBRACK;    /* [ */
+terminal RIGHTBRACK;    /* ] */
+terminal LEFTPAREN;   /* ( */
+terminal RIGHTPAREN;   /* ) */
+terminal LEFTAKULAD;    /* { */
+terminal RIGHTAKULAD;   /* } */
+terminal ADDASS;   /* += */
+terminal SUBASS;   /* -= */
+terminal MULTASS;    /* *= */
+terminal DIVASS;    /* /= */
+terminal NOT; /* not */
+terminal BITNEG;/* ~ */
+terminal ARITHAND;   /* & */
+terminal LOGICAND;   /* and */
+terminal ARITHOR;    /* | */
+terminal LOGICOR;    /* or */
+terminal XOR; /* ^ */
+terminal COLON; /* : */
+terminal EXTERN;
+
+// terminals for boolean , double , float , int , char , string;
+terminal  String BOOLEANCONST;
+terminal  String INTCONST;
+terminal  String DOUBLECONST;
+terminal  String STRINGCONST; // stringConstant     // our scanner provides Strings as identifier
+terminal  String FLOATCONST;
+terminal  String CHARCONST;
+terminal  String LONGCONST;
+/********** NON TERMINALs **********/
+
+non terminal    stmt;
+non terminal    expr;
+// Loops
+non terminal    for_state;
+non terminal    while_state;  // while statement
+non terminal    statement;
+non terminal    if_stmt;
+// if , if and else 
+non terminal    if_one_action_state;    // with no 'else'
+non terminal    if_multi_actoin_state; // with no 'else'
+non terminal    if_one_action_with_else_state;
+non terminal    if_multi_actoin_with_else_state;
+non terminal    accessmodes;
+non terminal    break_state;  // break statement
+non terminal    continue_state;  // continue statement
+non terminal    return_state;  // return statement  
+non terminal    actuals;
+non terminal    type_state;  // type statement
+
+non terminal    Call_state; //  call statement
+non terminal    cond_stmt ;
+non terminal    loop_stmt ;
+non terminal    constant_state; //constant statement
+
+// OPERATIONS
+//farzan
+non terminal    expr_with_operation;
+non terminal    more_expr;
+non terminal    expr_plus;
+non terminal    ContinueStmt;
+non terminal     exprs;
+// Declarations (xxxx_dcl)
+non terminal     declarations;
+non terminal     brakets;
+// Varaible: INT, DOUBLE, STRING, BOOLEAN, IDENTIFIER(id) 
+non terminal  variable_dcl;
+non terminal  Identifier;
+non terminal  func_dcl;
+non terminal  class_dcl;
+non terminal  extend_dcl;
+non terminal  implement_dcl;
+non terminal  interface_dcl;
+non terminal  possible_type;
+non terminal  optional_extend;
+non terminal  block;
+non terminal  block_par;
+non terminal  Program;
+non terminal  Structure;
+non terminal  Leftvalue;
+non terminal  constant_val;
+non terminal  method_call;
+non terminal  Prototype;
+non terminal  formals;
+non terminal  formalsMore;
+non terminal  type_args;
+non terminal  statements;
+non terminal  parameters;
+non terminal  assignment;
+non terminal  modes;
+non terminal  macro;
+non terminal  while_if_multi_actoin_state;
+non terminal  BreakStmt;
+non terminal  PrintStmt;
+non terminal  ReturnStmt;
+non terminal  func_extern;
+non terminal  extern_dcl;
+non terminal  Pars;
+non terminal Variable;
+non terminal  Fields;
+non terminal Identifiers;
+non terminal  Field;
+non terminal  StmtBlock;
+non terminal variable_dcl_plus;
+non terminal var_dcl_end;
+non terminal var_dcl_cnt;
+non terminal If_then_statement;
+non terminal Statement_no_short_if ;
+non terminal If_then_else_statement;
+non terminal While_statement_no_short_if ;
+non terminal ForStmt;
+non terminal actuals_comma;
+non terminal WhileStmt;
+non terminal If_then_statement_multi_task ;
+/********** PRECEDENCES **********/
+
+precedence left ELSE;
+precedence left ASSIGN;
+precedence left LOGICOR;
+precedence left LOGICAND;
+precedence left EQEQ, NOTEQ;
+precedence left LT, LTEQ, GT, GTEQ;
+precedence left PLUS, MINUS;
+precedence left MULT, DIV, MOD;
+precedence left LOGICSIGHN;
+precedence left DOT, LEFTBRACK;
+precedence left LEFTPAREN;
+
+/******* THE GRAMMER RULEs *******/
+// Start with program
+Program ::= declarations:d Program:p
+              {:
+                RESULT = p;
+                RESULT.addChild(d);
+              :}
+            | declarations:d
+              {:
+                RESULT = new RootNode();
+                RESULT.addChild(d);
+                setRoot((RootNode) RESULT);
+              :}
+            | macro declarations 
+            ;
+
+
+/************* Macro ************/
+// macro ::= IMPORT STRINGCONST | DEFINE Identifiers ;
+
+
+/********* Identifiers *********/
+// Identifiers ::= Identifier  Identifiers| ;
+
+
+/********** Identifier **********/
+Identifier ::= ID:i {:  RESULT = new IdentifierNode(i); :};
+
+
+/********** Declaration **********/
+// implement , decleration.
+declarations    ::= variable_dcl:vd
+                    {:
+                      RESULT = vd; 
+                    :}
+                  | class_dcl : cd 
+                    {:
+                      RESULT = cd;
+                    :}
+                  | func_dcl : fd
+                    {:
+                      RESULT = fd;
+                    :};
+
+
+/****** Variable decleration ******/
+variable_dcl   ::= Variable:var SEMICOLON
+                  {:
+                    RESULT = var;
+                  :};
+
+
+Variable  ::= possible_type:pt ID:i
+              {:
+                RESULT = new Node(NodeType.VARIABLE_DCL);
+                        RESULT.addChild(pt);
+                        RESULT.addChild(i);
+                        pt.setParent(RESULT);
+                        i.setParent(RESULT);
+              :};     
+                         
+
+/******* possible Types ********/
+possible_type   ::= INT
+                    {: RESULT = new PrimitiveNode(PrimitiveType.INT); :}
+                  | BOOL
+                    {: RESULT = new PrimitiveNode(PrimitiveType.BOOL); :}
+                  | FLOAT
+                    {: RESULT = new PrimitiveNode(PrimitiveType.FLOAT); :}
+                  | LONG
+                    {: RESULT = new PrimitiveNode(PrimitiveType.LONG); :}
+                  | CHAR
+                    {: RESULT = new PrimitiveNode(PrimitiveType.CHAR); :}
+                  | DOUBLE
+                    {: RESULT = new PrimitiveNode(PrimitiveType.DOUBLE); :}
+                  | STRING
+                    {: RESULT = new PrimitiveNode(PrimitiveType.STRING); :}
+                  | Identifier:t
+	                  {: RESULT = t; :}
+                  | possible_type:t BRACKETS;
+
+ //brakets ::= LEFTBRACK RIGHTBRACK;
+
+func_dcl        ::= possible_type:t Identifier:i LEFTPAREN formals:a RIGHTPAREN StmtBlock:b
+                    {:
+			                  RESULT = new Node(NodeType.FUNCTION_DCL);
+                        RESULT.addChild(t);
+                        RESULT.addChild(i);
+                        RESULT.addChild(a);
+                        RESULT.addChild(b);
+			                  t.setParent(RESULT);
+			                  i.setParent(RESULT);
+			                  a.setParent(RESULT);
+			                  b.setParent(RESULT);
+                    :}
+                    | VOID Identifier:i LEFTPAREN formals:a RIGHTPAREN StmtBlock:b
+                    {:
+                      Node  node= new PrimitiveNode(PrimitiveType.VOID);
+                        RESULT = new Node(NodeType.FUNCTION_DCL);
+                        RESULT.addChild(node);
+                        RESULT.addChild(i);
+                        RESULT.addChild(a);
+                        RESULT.addChild(b);
+                        node.setParent(RESULT);
+                        i.setParent(RESULT);
+                        a.setParent(RESULT);
+                        b.setParent(RESULT);
+                    :};
+
+formals ::= Variable:var formalsMore:fmore
+            {:
+               RESULT = new Node(NodeType.FORMAL);
+               RESULT.addChild(var);
+               RESULT.addChild(fmore);
+               var.setParent(RESULT);
+               fmore.setParent(RESULT);
+            :}
+          |    
+            {: 
+              RESULT = new EmptyNode();
+            :};
+
+
+formalsMore ::= COMMA Variable:var formalsMore:fmore
+              {:
+                  RESULT = fmore;
+                  Node a = new Node(NodeType.FORMAL);
+                  RESULT.addChild(fmore);
+                  fmore.setParent(RESULT);
+                  fmore.addChild(var);
+                  var.setParent(fmore);
+              :}
+              | 
+                {: RESULT = new EmptyNode(); :};
+
+accessmodes           ::=  PRIVATE 
+                          | PROTECTED
+                          | PUBLIC
+                          | ;
+
+/****** Class Decleration ******/
+// i not sure for class decleration.
+class_dcl    ::=  CLASS Identifier:i LEFTAKULAD Fields:fs RIGHTAKULAD 
+                  {:
+                      RESULT = new Node(NodeType.CLASS_DCL);
+                      RESULT.addChild(i);
+                      RESULT.addChild(fs);
+                      i.setParent(RESULT);
+                      fs.setParent(RESULT);
+                  :};
+
+// Pars         ::= extend_dcl | ;
+Fields        ::= Fields:fs Field:f
+                {:
+                    RESULT = new Node(NodeType.FIELDS);
+                      RESULT.addChild(fs);
+                      RESULT.addChild(f);
+                      fs.setParent(RESULT);
+                      f.setParent(RESULT);
+                      // s.setParent(RESULT);
+                :} 
+                | 
+                {: 
+                RESULT = new EmptyNode();
+                :};
+
+Field        ::= accessmodes:acm variable_dcl:vdl
+               {:  
+                  RESULT = vdl
+               :} 
+
+               | accessmodes func_dcl :fdl
+               {: RESULT:fdl; :};
+
+/******** Statement Block *******/
+StmtBlock    ::= LEFTAKULAD variable_dcl_plus:vdl_p statements:stmts RIGHTAKULAD
+               {:RESULT = new Node(NodeType.BLOCK);
+                        RESULT.addChild(vdl_p);
+                        RESULT.addChild(stmts);
+                        vdl_p.setParent(RESULT);
+                        stmts.setParent(RESULT);
+              :};
+
+
+variable_dcl_plus   ::= variable_dcl_plus:vdl_p variable_dcl:vdl
+                      {:
+                        RESULT = vdl_p;
+                        vdl_p.addChild(vdl);
+                        vdl.setParent(vdl_p);
+                    :}
+                      | {: RESULT = new EmptyNode(); :};
+
+  
+statements ::= statement:stmt statements:stmts
+             {:
+                RESULT =stmt ;
+                stmt.addChild(stmts);
+                stmts.setParent(stmt);
+              :}
+            | {: RESULT = new EmptyNode(); :};
+statement  ::= if_stmt:s
+                    {: RESULT = s; :}
+
+               | while_state:s
+                    {: RESULT = s; :}
+
+               | for_state :s
+                    {: RESULT = s; :}
+
+               | break_state:s
+                    {: RESULT = s; :}
+ 
+               | return_state:s
+                    {: RESULT = s; :}
+
+               | ContinueStmt:s
+                    {: RESULT = s; :}
+
+               | StmtBlock:s
+                    {: RESULT = s; :}
+
+               | PrintStmt:s
+                    {: RESULT = s; :}
+
+               | exprs:s SEMICOLON
+                    {: RESULT = s; :};
+
+
+exprs  ::= expr:e
+          {:
+             RESULT = e;
+          :} 
+          | {: RESULT = new EmptyNode(); :};
+ 
+
+if_stmt ::= IF LEFTPAREN expr:e RIGHTPAREN statement:stmt
+                    {:
+                        RESULT = new Node(NodeType.IF_STATEMENT);
+                        RESULT.addChild(e);
+                        RESULT.addChild(stmt);
+                        e.setParent(RESULT);
+                        stmt.setParent(RESULT);
+                    :}
+          | IF LEFTPAREN expr:e RIGHTPAREN statement:stmt ELSE statement:stmt2
+                    {:
+                        RESULT = new Node(NodeType.IF_STATEMENT);
+                        RESULT.addChild(e);
+                        RESULT.addChild(stmt);
+                        RESULT.addChild(stmt2);
+                        e.setParent(RESULT);
+                        stmt1.setParent(RESULT);
+                        stmt2.setParent(RESULT);
+                    :};
+
+/*** While ***/
+WhileStmt    ::= WHILE LEFTPAREN expr:e RIGHTPAREN statement:s
+                    {:
+                        RESULT = new Node(NodeType.WHILE_STATEMENT);
+                        RESULT.addChild(e);
+                        RESULT.addChild(s);
+                        e.setParent(RESULT);
+                        s.setParent(RESULT);
+                    :};
+
+/*** For ***/
+ForStmt      ::= FOR LEFTPAREN expr SEMICOLON expr:exr SEMICOLON expr:exr2 RIGHTPAREN statement:stmts;
+              //  | FOR LEFTPAREN  SEMICOLON expr:exr SEMICOLON expr::exr2 RIGHTPAREN statement:stmts;
+              //  | FOR LEFTPAREN  SEMICOLON expr:exr SEMICOLON  RIGHTPAREN statement:stmts
+              //  | FOR LEFTPAREN expr:exr SEMICOLON expr:exr2 SEMICOLON  RIGHTPAREN statement:stmts;
+
+
+/******* Return Statement *******/
+ReturnStmt          ::= RETURN expr:e SEMICOLON
+                      {:
+                          RESULT = new Node(NodeType.RETURN_STATEMENT);
+                          RESULT.addChild(e);
+                      :}
+                      | RETURN SEMICOLON;
+
+
+/******** Break Statement *********/
+BreakStmt           ::= BREAK SEMICOLON
+                       {: RESULT = new Node(NodeType.BREAK_STATEMENT); :};
+/******** Continue Statement *********/
+ContinueStmt        ::= CONTINUE SEMICOLON
+                    {: RESULT = new Node(NodeType.CONTINUE_STATEMENT); :};
+
+/******* Print Statement ********/
+PrintStmt           ::= PRINT LEFTPAREN expr_plus:ep RIGHTPAREN SEMICOLON
+                      {:
+                        RESULT = new Node(NodeType.PRINT_STATEMENT);
+                        RESULT.addChild(ep);
+                        ep.setParent(RESULT);
+                      :};
+
+expr_plus ::= expr:e COMMA expr_plus:ep
+                {:
+                 RESULT = new ExpressionNode();
+                 RESULT.addChild(e);
+                 e.setParent(RESULT); 
+                :}
+              | expr 
+                {:RESULT = new ExpressionNode();
+                 RESULT.addChild(e);
+                 e.setParent(RESULT);
+                :};
+
+/********** Expretion ***********/
+/* experations( except increase(inc) and decrease(dec)) */
+expr  ::= Leftvalue ASSIGN expr
+          {:
+              RESULT = new Node(NodeType.ASSIGN);
+              RESULT.addChild(l);
+              RESULT.addChild(e);
+              l.setParent(RESULT);
+              e.setParent(RESULT);
+          :}
+
+        | Leftvalue:l ADDASS expr:e
+        {:
+              RESULT = new Node(NodeType.ADDASS);
+              RESULT.addChild(l);
+              RESULT.addChild(e);
+              l.setParent(RESULT);
+              e.setParent(RESULT);
+          :}
+        | Leftvalue:l SUBASS expr:e
+        {:
+              RESULT = new Node(NodeType.SUBASS);
+              RESULT.addChild(l);
+              RESULT.addChild(e);
+              l.setParent(RESULT);
+              e.setParent(RESULT);
+          :}
+        | Leftvalue:l MULTASS expr:e
+        {:
+              RESULT = new Node(NodeType.MULTASS);
+              RESULT.addChild(l);
+              RESULT.addChild(e);
+              l.setParent(RESULT);
+              e.setParent(RESULT);
+          :}
+        | Leftvalue:l DIVASS expr:e
+        {:
+              RESULT = new Node(NodeType.DIVASS);
+              RESULT.addChild(l);
+              RESULT.addChild(e);
+              l.setParent(RESULT);
+              e.setParent(RESULT);
+          :}
+        | constant_val:c
+        {:
+            RESULT = new ExpressionNode();
+            RESULT.addChild(c);
+            c.setParent(RESULT);
+        :}
+        | Leftvalue:l
+        {:
+            RESULT = new ExpressionNode();
+            RESULT.addChild(l);
+            l.setParent(RESULT);
+        :}
+        | THIS:t
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.THIS);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+        :}
+
+        | Call_state:c
+        {:
+            RESULT = new ExpressionNode();
+            RESULT.addChild(c);
+            c.setParent(RESULT);
+        :} 
+
+        | LEFTPAREN expr:e RIGHTPAREN
+        {: RESULT = e; :}
+
+        | expr:e1 PLUS expr:e2
+         {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.ADDITION);
+            t.addChild(e1);
+            t.addChild(e2);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            e1.setParent(t);
+            e2.setParent(t);
+        :}
+
+        | expr:e1 MINUS expr:e2
+        {:
+          RESULT = new ExpressionNode();
+          Node t = new Node(NodeType.SUBTRACTION);
+          t.addChild(e1);
+          t.addChild(e2);
+          RESULT.addChild(t);
+          t.setParent(RESULT);
+          e1.setParent(t);
+          e2.setParent(t);
+        :}
+
+        | expr:e1 MULT expr:e2
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.MULTIPLICATION);
+            t.addChild(e1);
+            t.addChild(e2);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            e1.setParent(t);
+            e2.setParent(t);
+        :}
+        
+        | expr:e1 DIV expr:e2
+        {:
+          RESULT = new ExpressionNode();
+          Node t = new Node(NodeType.DIVISION);
+          t.addChild(e1);
+          t.addChild(e2);
+          RESULT.addChild(t);
+          t.setParent(RESULT);
+          e1.setParent(t);
+          e2.setParent(t);
+       :}
+
+        | expr:e1 MOD expr:e2
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.MOD);
+            t.addChild(e1);
+            t.addChild( e2);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            e1.setParent(t);
+            e2.setParent(t);
+        :}
+
+        | NOT expr:e1
+        {:
+          RESULT = new ExpressionNode();
+          Node t = new Node(NodeType.UNARY_MINUS);
+          t.addChild(e);
+          RESULT.addChild(t);
+          t.setParent(RESULT);
+          e.setParent(t);
+        :}
+
+        | expr:e1 LT expr:e2
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new SimpleNode(NodeType.LESS_THAN);
+            t.addChild(e1);
+            t.addChild(e2);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            e1.setParent(t);
+            e2.setParent(t);
+        :}
+
+        | expr:e1 GT expr:e2
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.GREATER_THAN);
+            t.addChild(e1);
+            t.addChild(e2);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            e1.setParent(t);
+            e2.setParent(t);
+        :}
+
+        | expr:e1 LTEQ expr:e2
+        {:
+          RESULT = new ExpressionNode();
+          Node t = new Node(NodeType.LESS_THAN_OR_EQUAL);
+          t.addChild(e1);
+          t.addChild(e2);
+          RESULT.addChild(t);
+          t.setParent(RESULT);
+          e1.setParent(t);
+          e2.setParent(t);
+        :}
+
+        | expr:e1 GTEQ expr:e2
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.GREATER_THAN_OR_EQUAL);
+            t.addChild(e1);
+            t.addChild(e2);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            e1.setParent(t);
+            e2.setParent(t);
+        :}
+
+        | expr:e1 EQEQ expr:e2
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.EQUAL);
+            t.addChild(e1);
+            t.addChild(e2);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            e1.setParent(t);
+            e2.setParent(t);
+       :}
+
+        | expr:e1 NOTEQ expr:e2
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.NOT_EQUAL);
+            t.addChild(e1);
+            t.addChild(e2);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            e1.setParent(t);
+            e2.setParent(t);
+       :}
+
+        | expr:e1 LOGICAND expr:e2
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.BOOLEAN_AND);
+            t.addChild(e1);
+            t.addChild(e2);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            e1.setParent(t);
+            e2.setParent(t);
+        :}
+
+        | expr:e1 LOGICOR expr:e2
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.BOOLEAN_OR);
+            t.addChild(e1);
+            t.addChild(e2);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            e1.setParent(t);
+            e2.setParent(t);
+        :}
+
+        | LOGICSIGHN expr:e
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.BOOLEAN_NOT);
+            t.addChild(e);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            e.setParent(t);
+        :}
+
+        | READLINE LEFTPAREN RIGHTPAREN
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.READ_LINE);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+        :}
+
+        | NEW Identifier:i
+        {:
+            RESULT = new ExpressionNode();
+            Node t = new Node(NodeType.NEW_IDENTIFIER);
+            t.addChild(i);
+            RESULT.addChild(t);
+            t.setParent(RESULT);
+            i.setParent(t);
+        :}
+
+        | NEWARRAY LEFTPAREN expr:e COMMA possible_type:t RIGHTPAREN
+        {:
+            RESULT = new ExpressionNode();
+            Node s = new Node(NodeType.ARRAY_DECLARATION);
+            s.addChild(e, t);
+            RESULT.addChild(t);
+            s.setParent(RESULT);
+            e.setParent(s);
+            t.setParent(s);
+        :}
+
+        | ITOD LEFTPAREN expr:e RIGHTPAREN
+        {:
+                         RESULT = new ExpressionNode();
+                         Node t = new Node(NodeType.ITOD);
+                         t.addChild(e);
+                         RESULT.addChild(t);
+                         t.setParent(RESULT);
+                         e.setParent(t);
+                     :}
+
+        | ITOB LEFTPAREN expr:e RIGHTPAREN
+        {:
+                         RESULT = new ExpressionNode();
+                         Node t = new Node(NodeType.ITOB);
+                         t.addChild(e);
+                         RESULT.addChild(t);
+                         t.setParent(RESULT);
+                         e.setParent(t);
+                     :}
+
+        |DTOI LEFTPAREN expr:e RIGHTPAREN
+         {:
+                         RESULT = new ExpressionNode();
+                         Node t = new Node(NodeType.DTOI);
+                         t.addChild(e);
+                         RESULT.addChild(t);
+                         t.setParent(RESULT);
+                         e.setParent(t);
+                     :}
+        | __LINE__ 
+        {:
+                          RESULT = new ExpressionNode();
+                         Node t = new Node(NodeType.LINE);
+                         t.addChild(line);
+                         RESULT.addChild(t);
+                         :}
+        | __FUNC__
+        {:
+                          RESULT = new ExpressionNode();
+                         Node t = new Node(NodeType.FUNC);
+                         t.addChild(line);
+                         RESULT.addChild(t);
+        :};
+        
+/********* Operations *********/
+// expr_with_operation     ::= ;
+
+// assignment     ::= 
+
+
+Leftvalue       ::= Identifier:ident
+                    {: RESULT = ident; :}
+
+                  | expr:e DOT Identifier:ident
+                  {:
+                      RESULT = new Node(NodeType.FIELD);
+                      RESULT.addChild(e);
+                      RESULT.addChild(ident);
+                      e.setParent(RESULT);
+                      ident.setParent(RESULT);
+                  :}
+
+                  | expr:e LEFTBRACK expr:e1 RIGHTBRACK;
+
+
+Call_state   ::= Identifier:ident LEFTPAREN actuals:a RIGHTPAREN
+              {:
+                  RESULT = new Node(NodeType.FUNCTION_CALL);
+                  RESULT.addChild(ident);
+                  RESULT.addChild(a);
+                  ident.setParent(RESULT);
+                  a.setParent(RESULT);
+              :}
+
+               | expr:e DOT Identifier:ident LEFTPAREN actuals:a RIGHTPAREN
+                {:
+                    RESULT = new Node(NodeType.FUNCTION_CALL);
+                    RESULT.addChild(e);
+                    RESULT.addChild(ident);
+                  RESULT.addChild(a);
+                    e.setParent(RESULT);
+                    ident.setParent(RESULT);
+                    a.setParent(RESULT);
+                :};
+
+
+actuals ::= expr:e actuals_comma:ac
+          {:
+             RESULT = new Node(NodeType.PARAMETERS);
+             RESULT.addChild(e);
+             e.setParent(RESULT);
+             RESULT.addChild(ac);
+             ac.setParent(RESULT);
+          :}
+          | {: RESULT = new EmptyNode(); :};
+
+actuals_comma ::= COMMA expr:e actuals_comma:ac
+          {:
+              RESULT =ac ;
+              ac.addChild(e);
+              e.setParent(ac);
+          :}
+
+          | {: RESULT = new EmptyNode(); :};
+
+
+/******* Constant Values *******/
+constant_val     ::=INTCONST:i
+                        {: RESULT = new IntegerLiteralNode(i); :}
+                    | NULL
+    	                   {: RESULT = new EmptyNode(); :}
+                    | CHARCONST:c
+                        {: RESULT = new CharConst(c); :}
+                    | FALSE 
+                        {: RESULT = new BooleanLiteralNode(t); :}
+                    | TRUE
+                        {: RESULT = new BooleanLiteralNode(t); :}
+                    | STRINGCONST:s
+                        {: RESULT = new StringLiteralNode(s); :};
+
